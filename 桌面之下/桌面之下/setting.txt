@@ -1,0 +1,10 @@
+7
+D:\File\Program\ffmpeg\ffplay.exe
+D:\File\Program\ffmpeg\ffmpeg.exe
+
+D:\File\ÌØÊâ\¶¯Ì¬±ÚÖ½\video\1.mp4
+
+
+1
+41879900 0 0 0 1920 1080 
+Show_Console
