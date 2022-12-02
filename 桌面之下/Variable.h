@@ -48,8 +48,7 @@
 * 1.0.3.13 加入-repair参数，恢复所有在PM窗口下的bug窗口
 * 1.0.3.14 修复调用ffmpeg时的C6335句柄泄露bug
 * 
-* Next ffplay播放视频 更改窗口名称 守护线程 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 
-* bug CreatProsess()C6335句柄泄露
+* Next ffplay播放视频 更改窗口名称 守护线程 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg)
 */
 
 #define	Message(STRING) MessageBox(NULL, STRING, L"桌面之下", MB_YESNO)
