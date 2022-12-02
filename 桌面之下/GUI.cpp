@@ -640,14 +640,23 @@ void Event(bool Flag)
 							Update_Draw = true;
 							Update_Zero_HWND = true;
 						}
-						else if (Now_Window->Get_Window_HWND() != NULL)
+						else
 						{
-							//没有下一个，且当前不是0-->创建下一个
-							Now_Window->Set_Next_Window_ptr(new Window_Infomation);
-							Now_Window->Get_Next_Window_ptr()->Set_Last_Window_ptr(Now_Window);
-							Now_Window = Now_Window->Get_Next_Window_ptr();
-							Update_Draw = true;
-							Update_Zero_HWND = true;
+							//没有下一个
+							if (Now_Window->Get_Window_HWND() != NULL)
+							{
+								//且当前不是0-->创建下一个
+								Now_Window->Set_Next_Window_ptr(new Window_Infomation);
+								Now_Window->Get_Next_Window_ptr()->Set_Last_Window_ptr(Now_Window);
+								Now_Window = Now_Window->Get_Next_Window_ptr();
+								Update_Draw = true;
+								Update_Zero_HWND = true;
+							}
+							else
+							{
+								//且当前是0-->搜索PM窗口
+								Get_Child_Window(Now_Window);//获取并链接PM子窗口
+							}
 						}
 					}//右侧
 					break;

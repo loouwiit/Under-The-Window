@@ -47,6 +47,7 @@
 * 1.0.3.12 修复不能正常隐藏ffplay窗口的bug
 * 1.0.3.13 加入-repair参数，恢复所有在PM窗口下的bug窗口
 * 1.0.3.14 修复调用ffmpeg时的C6335句柄泄露bug
+* 1.0.3.15 在最后一项向后将搜索PM的子窗口
 * 
 * Next ffplay播放视频 更改窗口名称 守护线程 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg)
 */
@@ -54,7 +55,7 @@
 #define	Message(STRING) MessageBox(NULL, STRING, L"桌面之下", MB_YESNO)
 
 constexpr unsigned File_Version = 7;
-constexpr char Progream_Version[] = "1.0.3.14";
+constexpr char Progream_Version[] = "1.0.3.15";
 //constexpr unsigned Progream_Version = 2;
 constexpr char endl = '\n';
 

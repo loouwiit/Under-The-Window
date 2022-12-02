@@ -52,7 +52,7 @@ END
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION 0,0,0,1
- PRODUCTVERSION 1,0,3,14
+ PRODUCTVERSION 1,0,3,15
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -72,7 +72,7 @@ BEGIN
             VALUE "InternalName", "桌面之下"
             VALUE "OriginalFilename", "桌面之下"
             VALUE "ProductName", "桌面之下"
-            VALUE "ProductVersion", "1.0.3.14"
+            VALUE "ProductVersion", "1.0.3.15"
         END
     END
     BLOCK "VarFileInfo"
