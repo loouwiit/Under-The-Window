@@ -197,6 +197,9 @@ void Window_Infomation::Update_Infomation()
 
 	//更新桌面之下情况
 	this->Window_Undered = GetAncestor(this->Window_HWND, GA_PARENT) == Window_Infomation::Get_PM_Window_HWND() || GetAncestor(this->Window_HWND, GA_PARENT) == Window_Infomation::W1_Window_HWND;//PM窗口下或者W1窗口下
+
+	//更新ffplay情况
+	Update_Is_ffplay_Window();
 }
 
 RECT& Window_Infomation::Get_Infomation()

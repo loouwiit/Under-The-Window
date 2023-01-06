@@ -48,15 +48,16 @@
 * 1.0.3.13 加入-repair参数，恢复所有在PM窗口下的bug窗口
 * 1.0.3.14 修复调用ffmpeg时的C6335句柄泄露bug
 * 1.0.3.15 在最后一项向后将搜索PM的子窗口
-* 1.0.3.16 加入暂停ffplay的功能
+* 1.0.3.16 加入暂停ffplay的功能 2023/1/6
+* 1.0.3.17 修复识别ffplay需要点一下非壁纸窗口的bug(update_Infomation中自动调用Update_Is_ffplay_Window)
 * 
-* Next 更改窗口名称 守护线程 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg)
+* Next 更改窗口名称 守护线程 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 重置设置文件格式
 */
 
 #define	Message(STRING) MessageBox(NULL, STRING, L"桌面之下", MB_YESNO)
 
 constexpr unsigned File_Version = 7;
-constexpr char Progream_Version[] = "1.0.3.16";
+constexpr char Progream_Version[] = "1.0.3.17";
 //constexpr unsigned Progream_Version = 2;
 constexpr char endl = '\n';
 

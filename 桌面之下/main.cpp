@@ -476,6 +476,7 @@ void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[])
 		{
 
 			Now_Window->Set_Window_Under();
+			Now_Window->Set_ffplay_Window(true); //1.0.3.17
 
 			if (!Show_Console)
 			{
