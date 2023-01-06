@@ -31,6 +31,9 @@ Window_Infomation::Window_Infomation()
 	this->Last_Window_ptr = nullptr;
 	this->Next_Window_ptr = nullptr;
 	Window_Infomation::All_Window_Number++;
+
+	//this->Window_Is_Pause = false;
+	Update_Is_ffplay_Window();
 }
 
 /// <summary>
@@ -94,45 +97,77 @@ Window_Infomation::~Window_Infomation()
 	this->Window_Top_Most = Flag;
 }
 
+ /// <summary>
+ /// 获取是否是ffplay的动态壁纸
+ /// </summary>
+ /// <returns>是否是ffplay的动态壁纸</returns>
+ bool Window_Infomation::Is_ffplay_Window()
+ {
+	 return this->Window_Is_ffplay;
+ }
+
+ /// <summary>
+ /// 设置是否是ffplay的动态壁纸
+ /// </summary>
+ /// <param name="Flag"是否是ffplay的动态壁纸></param>
+ void Window_Infomation::Set_ffplay_Window(bool Flag)
+ {
+	 this->Window_Is_ffplay = Flag;
+ }
+
+ /// <summary>
+ /// 自动判断是否是ffplay的动态壁纸
+ /// </summary>
+ void Window_Infomation::Update_Is_ffplay_Window()
+ {
+	 if (IsWindow(this->Window_HWND))
+	 {
+		 wchar_t Window_Class_Name[8] = L"";//SDL_app
+		 wchar_t Window_Name[10] = L"";//Wallpaper
+		 GetClassName(this->Window_HWND, Window_Class_Name, 8);
+		 GetWindowText(this->Window_HWND, Window_Name, 10);
+		 if (wcscmp(Window_Class_Name, L"SDL_app") == 0 && wcscmp(Window_Name, L"Wallpaper") == 0)
+			 this->Window_Is_ffplay = true;
+		 else
+			 this->Window_Is_ffplay = false;
+	 }
+	 else
+	 {
+		 this->Window_Is_ffplay = false;
+	 }
+ }
+
  ///// <summary>
- ///// 获取是否是ffplay的动态壁纸
+ ///// 获取是否已经暂停
+ ///// 若非ffplay窗口将返回false
  ///// </summary>
- ///// <returns>是否是ffplay的动态壁纸</returns>
- //bool Window_Infomation::Is_ffplay_Window()
+ ///// <returns>是否暂停</returns>
+ //bool Window_Infomation::Is_Pause()
  //{
-	// return this->Window_Is_ffplay;
+	// return Window_Is_ffplay && Window_Is_Pause;
  //}
 
  ///// <summary>
- ///// 设置是否是ffplay的动态壁纸
+ ///// 设置是否已经暂停
  ///// </summary>
- ///// <param name="Flag"是否是ffplay的动态壁纸></param>
- //void Window_Infomation::Set_ffplay_Window(bool Flag)
+ ///// <param name="Flag">是否暂停</param>
+ //void Window_Infomation::Set_Pause(bool Flag)
  //{
-	// this->Window_Is_ffplay = Flag;
+	// Window_Is_Pause = Flag;
  //}
 
- ///// <summary>
- ///// 自动判断是否是ffplay的动态壁纸
- ///// </summary>
- //void Window_Infomation::Update_Is_ffplay_Window()
- //{
-	// if (IsWindow(this->Window_HWND))
-	// {
-	//	 wchar_t Window_Class_Name[8] = L"";//SDL_app
-	//	 wchar_t Window_Name[10] = L"";//Wallpaper
-	//	 GetClassName(this->Window_HWND, Window_Class_Name, 8);
-	//	 GetWindowText(this->Window_HWND, Window_Name, 10);
-	//	 if (wcscmp(Window_Class_Name, L"SDL_app") == 0 && wcscmp(Window_Name, L"Wallpaper") == 0)
-	//		 this->Window_Is_ffplay = true;
-	//	 else
-	//		 this->Window_Is_ffplay = false;
-	// }
-	// else
-	// {
-	//	 this->Window_Is_ffplay = false;
-	// }
- //}
+ /// <summary>
+ /// 暂停ffplay
+ /// 发送空格键消息
+ /// </summary>
+ void Window_Infomation::Pause_ffplay()
+ {
+	 if (!Window_Is_ffplay) return;
+
+	 PostMessageA(Window_HWND, WM_KEYDOWN, VK_SPACE, 0x00390001);
+	 PostMessageA(Window_HWND, WM_CHAR, VK_SPACE, 0x00390001);
+	 PostMessageA(Window_HWND, WM_KEYUP, VK_SPACE, 0xC0390001);
+ }
 
 /// <summary>
 /// 更新窗口信息

@@ -15,9 +15,12 @@ public:
 	bool Is_Top_Most();
 	void Set_Top_Most(bool Flag);
 
-	//bool Is_ffplay_Window();
-	//void Set_ffplay_Window(bool Flag);
-	//void Update_Is_ffplay_Window();
+	bool Is_ffplay_Window();
+	void Set_ffplay_Window(bool Flag);
+	void Update_Is_ffplay_Window();
+	//bool Is_Pause();
+	//void Set_Pause(bool Flag);
+	void Pause_ffplay();
 
 	void Update_Infomation();
 	RECT& Get_Infomation();
@@ -77,7 +80,8 @@ private:
 
 	bool Window_Undered = false;//窗口的桌面之下情况
 	bool Window_Top_Most = false;//窗口是否是顶层窗口
-	//bool Window_Is_ffplay = false;//窗口是否是ffplay的壁纸
+	bool Window_Is_ffplay = false;//窗口是否是ffplay的壁纸
+	//bool Window_Is_Pause = false;//ffplay是否暂停
 	HWND Window_HWND = NULL;//窗口句柄
 	HWND Window_Parent_HWND = NULL;//窗口父窗口句柄
 	RECT Window_Now_RECT = RECT{};//窗口现在的大小

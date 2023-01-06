@@ -5,6 +5,7 @@ D:\File\Program\ffmpeg\ffmpeg.exe
 D:\File\ÌØÊâ\¶¯Ì¬±ÚÖ½\video\1.mp4
 
 
-1
-41879900 0 0 0 1920 1080 
+2
+463078 0 0 0 1920 1080 
+528630 0 0 0 0 0 
 Show_Console

@@ -457,7 +457,8 @@ void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[])
 		sprintf_s(Video_Decoder, (size_t)Video_Decoder_Lenght + 8, "-vcodec %s", Video_Decoder_Param);
 	}
 
-	sprintf_s(Param, Param_Lengh, " \"%s\" %s -noborder -x %i -y %i -loop 0 %s -an -framedrop -window_title Wallpaper -exitonmousedown -exitonkeydown", Video_Path_Param, Video_Decoder, DeskTop_Size[0], DeskTop_Size[1], Show_Console ? "" : "-loglevel quiet");
+	sprintf_s(Param, Param_Lengh, " \"%s\" %s -noborder -x %i -y %i -loop 0 %s -an -framedrop -window_title Wallpaper -exitonmousedown", Video_Path_Param, Video_Decoder, DeskTop_Size[0], DeskTop_Size[1], Show_Console ? "" : "-loglevel quiet");
+	//-exitonkeydown 1.0.3.16删除
 
 	if (Show_Console) std::cout << "播放视频，调用信息:" << Param << endl;//给出参数
 

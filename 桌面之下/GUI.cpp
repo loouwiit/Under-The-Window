@@ -240,7 +240,7 @@ void Print()
 		Text[8].setString(L"拖动选择窗口");
 		Text[9].setString(L"设置窗口置顶");
 		Text[10].setString(L"移到桌面之下");
-		Text[11].setString(L"------");
+		Text[11].setString(L"非壁纸窗口");
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -361,6 +361,11 @@ void Print()
 		else
 			Text[11].setString(L"退出时恢复");
 		*/
+
+		if (!Now_Window->Is_ffplay_Window()) //1.0.3.16加入
+			Text[11].setString(L"非壁纸窗口");
+		else
+			Text[11].setString(L"暂停壁纸");
 
 
 		Window.clear(sf::Color(0x99FFFFFF));
@@ -722,7 +727,11 @@ void Event(bool Flag)
 					else
 					{
 						//Keep_Under();//保持之下 1.0.2.5删除
-						Record();//1.0.3.14试图添加
+						//Record();//1.0.3.14试图添加
+						if (Now_Window->Is_ffplay_Window())//1.0.3.16加入
+							Now_Window->Pause_ffplay();
+						else
+							Now_Window->Update_Is_ffplay_Window();
 					}
 					break;
 				}
