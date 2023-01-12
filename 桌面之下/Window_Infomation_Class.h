@@ -59,6 +59,7 @@ public:
 	static void Set_Self_Window_Exist(bool Flag);
 	static bool Get_Self_Window_Exist();
 
+	static void Get_Desktop_Size(int& x, int& y);
 	static bool Get_W1_W2_Error();
 	static void Reset_W1_W2_Error();
 	static HWND Get_And_Hide_PM_Window_HWND();

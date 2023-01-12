@@ -478,6 +478,19 @@ void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[])
 			Now_Window->Set_Window_Under();
 			Now_Window->Set_ffplay_Window(true); //1.0.3.17
 
+			//1.0.3.18 尝试隐藏任务栏图标
+			//{
+			//	DWORD dwExStyle = GetWindowLong(Now_Window->Get_Window_HWND(), GWL_STYLE);
+			//	//dwExStyle &= ~(WS_VISIBLE);
+			//	dwExStyle |= WS_EX_TOOLWINDOW;
+			//	dwExStyle &= ~(WS_EX_APPWINDOW);
+			//	SetWindowLong(Now_Window->Get_Window_HWND(), GWL_STYLE, dwExStyle);
+			//	//ShowWindow(Now_Window->Get_Window_HWND(), SW_SHOW);
+			//	//ShowWindow(Now_Window->Get_Window_HWND(), SW_HIDE);
+			//	//UpdateWindow(Now_Window->Get_Window_HWND());
+			//	printf_s("%d", GetLastError()); //1400
+			//}
+
 			if (!Show_Console)
 			{
 				//获取并隐藏ffplay

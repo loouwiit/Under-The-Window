@@ -5,7 +5,6 @@ D:\File\Program\ffmpeg\ffmpeg.exe
 D:\File\ÌØÊâ\¶¯Ì¬±ÚÖ½\video\1.mp4
 
 
-2
-528520 0 0 0 0 0 
+1
 0 0 0 0 0 0 
 Show_Console

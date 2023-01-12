@@ -48,13 +48,13 @@ void Event_Key(sf::Event::KeyEvent Key, ENUM::Input_Position Input_Position);//°
 
 int main(const int argc, const char* argv[])
 {
-
+	std::cout << Progream_Version << endl;
 #ifdef _DEBUG
 	std::cout << "Debug°æ±¾" << endl;
 #endif // _DEBUG
 #ifndef _WIN64
 	std::cout << "32Î»°æ±¾" << endl;
-#endif _WIN64
+#endif // _WIN64
 
 	if (!CMD_Call(argc, argv))
 	{

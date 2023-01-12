@@ -544,6 +544,9 @@ void Window_Infomation::Find_Self_Window_HWND()
 
 		if (!IsWindow(Self_Window_HWND))
 			Self_Window_HWND = FindWindow(L"SFML_Window", NULL);//名称不对，再次寻找
+
+		if (!IsWindow(Self_Window_HWND))
+			Self_Window_Exist = false; //仍然失败，标记窗口不存在
 	}
 }
 
@@ -581,6 +584,23 @@ void Window_Infomation::Set_Self_Window_Exist(bool Flag)
 bool Window_Infomation::Get_Self_Window_Exist()
 {
 	return Self_Window_Exist;
+}
+
+/// <summary>
+/// 获取桌面大小
+/// </summary>
+/// <param name="x">X返回地址</param>
+/// <param name="y">Y返回地址</param>
+void Window_Infomation::Get_Desktop_Size(int& x, int& y)
+{
+	if (DeskTop_Size[0] == 0 || DeskTop_Size[1] == 0)
+	{
+		DeskTop_Size[0] = GetSystemMetrics(SM_CXSCREEN);
+		DeskTop_Size[1] = GetSystemMetrics(SM_CYSCREEN);
+	}
+
+	x = DeskTop_Size[0];
+	y = DeskTop_Size[1];
 }
 
 /// <summary>

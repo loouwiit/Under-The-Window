@@ -50,14 +50,15 @@
 * 1.0.3.15 在最后一项向后将搜索PM的子窗口
 * 1.0.3.16 加入暂停ffplay的功能 2023/1/6
 * 1.0.3.17 修复识别ffplay需要点一下非壁纸窗口的bug(update_Infomation中自动调用Update_Is_ffplay_Window)
+* 1.0.3.18 尝试修复有时ffplay窗口在任务栏显示的bug 配合守护线程完善自我窗口存在的标记 配合守护线程加入获取桌面大小的函数 启动将在控制台输出版本消息
 * 
-* Next 更改窗口名称 守护线程 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 重置设置文件格式
+* Next 更改窗口名称 守护线程 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 重置设置文件格式 任务栏显示ffplay的bug
 */
 
 #define	Message(STRING) MessageBox(NULL, STRING, L"桌面之下", MB_YESNO)
 
 constexpr unsigned File_Version = 7;
-constexpr char Progream_Version[] = "1.0.3.17";
+constexpr char Progream_Version[] = "1.0.3.18";
 //constexpr unsigned Progream_Version = 2;
 constexpr char endl = '\n';
 
@@ -143,7 +144,7 @@ void Repair_W1_W2_Error(Window_Infomation* Window_Infomation_ptr = nullptr);//�
 //BOOL CALLBACK Hide_PM_W2(_In_ HWND hwnd, _In_ LPARAM Lparam);//找W2窗口并隐藏 1.0.2.5删除
 
 //void ffplay_Pause_Thread(std::vector<HWND>& ffplay_Windows);//ffplay线程
-void Record();//录制
+//void Record();//录制
 void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[]);//播放视频
 void Creat_Vidoe_Texture(int Number);//创建图片
 //void Get_PM_Window_HWND(HWND& Return);//获取PM窗口句柄
