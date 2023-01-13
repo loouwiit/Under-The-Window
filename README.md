@@ -1,6 +1,6 @@
 # 桌面之下
 下载: <br>
-<a href="https://github.com/loouwiit/Under-The-Window/blob/master/%E7%94%9F%E6%88%90/1.0.3.17%2B0.0.0.1.zip">1.0.3.17</a> <br>
+<a href="https://github.com/loouwiit/Under-The-Window/blob/master/%E7%94%9F%E6%88%90/1.0.3.19%2B0.0.0.2.zip">1.0.3.19</a> <br>
 setting.txt:<br/>
 |　文件版本 <br/>
 |　ffplay路径 <br/>
