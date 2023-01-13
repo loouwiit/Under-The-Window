@@ -84,18 +84,18 @@ Window_Infomation::~Window_Infomation()
 /// </summary>
 /// <param name="Flag">是否设置为顶层窗口</param>
  void Window_Infomation::Set_Top_Most(bool Flag)
-{
-	if (Flag)
-		SetWindowPos(this->Window_HWND, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	else
-		SetWindowPos(this->Window_HWND, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	
-	if (this->Window_HWND == this->Self_Window_HWND)
-		Window_Infomation::Set_Self_Top_Most(Flag);//自己有专用的函数
-	else
-		SetWindowPos(this->Self_Window_HWND, this->Self_Window_Top_Most ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	this->Window_Top_Most = Flag;
-}
+ {
+	 if (Flag)
+		 SetWindowPos(this->Window_HWND, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	 else
+		 SetWindowPos(this->Window_HWND, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+	 if (this->Window_HWND == this->Self_Window_HWND)
+		 Window_Infomation::Set_Self_Top_Most(Flag);//自己有专用的函数
+	 else
+		 SetWindowPos(this->Self_Window_HWND, this->Self_Window_Top_Most ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	 this->Window_Top_Most = Flag;
+ }
 
  /// <summary>
  /// 获取是否是ffplay的动态壁纸
@@ -157,16 +157,15 @@ Window_Infomation::~Window_Infomation()
  //}
 
  /// <summary>
- /// 暂停ffplay
- /// 发送空格键消息
+ /// 发送键盘消息
  /// </summary>
- void Window_Infomation::Pause_ffplay()
+ /// <param name="Key">键盘消息</param>
+ /// <param name="lParam">lparam</param>
+ void Window_Infomation::Send_Message(char Key, unsigned long lParam)
  {
-	 if (!Window_Is_ffplay) return;
-
-	 PostMessageA(Window_HWND, WM_KEYDOWN, VK_SPACE, 0x00390001);
-	 PostMessageA(Window_HWND, WM_CHAR, VK_SPACE, 0x00390001);
-	 PostMessageA(Window_HWND, WM_KEYUP, VK_SPACE, 0xC0390001);
+	 PostMessageA(Window_HWND, WM_KEYDOWN, Key, lParam);
+	 PostMessageA(Window_HWND, WM_CHAR, Key, lParam);
+	 PostMessageA(Window_HWND, WM_KEYUP, Key, lParam | 0xC0000000);
  }
 
 /// <summary>
@@ -214,8 +213,8 @@ RECT& Window_Infomation::Get_Infomation()
 /// <param name="Window_HWND">窗口句柄</param>
 void Window_Infomation::Set_Window_HWND(HWND Window_HWND)
 {
-	if (this->Window_Undered)
-		this->Set_Window_Up();
+	//if (this->Window_Undered) //1.0.3.19
+	//	this->Set_Window_Up();
 
 	this->Window_HWND = Window_HWND;
 	this->Update_Window_HWND();

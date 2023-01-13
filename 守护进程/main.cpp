@@ -11,8 +11,8 @@
 */
 
 /*
-* 0.0.0.1 初号版本
-* 
+* 0.0.0.1 初号版本 跟随1.0.3.18
+* 0.0.0.2 添加关闭功能 右键功能同左键 中键功能为切换 修改暂停机制，暂停需要超过81%持续5秒，恢复需要2秒 跟随1.0.3.19
 * next
 */
 
@@ -22,8 +22,9 @@ struct Window_And_HWND
 	HWND Window_HWND;
 };
 
-constexpr unsigned int update_Time = 5;
-constexpr char Progream_Version[] = "0.0.0.1";
+constexpr unsigned int update_Time = 1;
+constexpr unsigned int continue_Time[2] = { 2,5 }; //恢复和暂停
+constexpr char Progream_Version[] = "0.0.0.2";
 constexpr char endl = '\n';
 constexpr bool Ignore_Other_Window = true;
 #ifdef _DEBUG
@@ -50,6 +51,7 @@ void Enetialize();
 
 void update_All_Window();
 void pause_All_Window();
+void close_All_Window();
 void Repair_W1_W2_Error(Window_Infomation* Window_Infomation_ptr);
 void Get_Child_Window(Window_Infomation* Window_Infomation_ptr, HWND Parent_Window_WHND = Window_Infomation::Get_PM_Window_HWND());//枚举并连接PM的子窗口
 BOOL CALLBACK Enum_Child_Widow(HWND Window_HWND, LPARAM lparam);//枚举的回调函数
@@ -161,7 +163,17 @@ void pause_All_Window()
 		now_Window = now_Window->Get_Last_Window_ptr();
 	for (Window_Infomation* temp = now_Window; temp != nullptr; temp = temp->Get_Next_Window_ptr())
 	{
-		temp->Pause_ffplay();
+		temp->Send_Message(VK_SPACE, 0x00390001);
+	}
+}
+
+void close_All_Window()
+{
+	while (now_Window->Get_Last_Window_ptr() != nullptr)
+		now_Window = now_Window->Get_Last_Window_ptr();
+	for (Window_Infomation* temp = now_Window; temp != nullptr; temp = temp->Get_Next_Window_ptr())
+	{
+		temp->Send_Message(VK_ESCAPE, 0x00010001);
 	}
 }
 
@@ -264,7 +276,8 @@ constexpr unsigned long long ID_HPAUSE = 40002;
 constexpr unsigned long long ID_PAUSED = 40003;
 constexpr unsigned long long ID_SEARCH = 40004;
 constexpr unsigned long long ID_CHANGE = 40005;
-constexpr unsigned long long ID_EXIT = 40006;
+constexpr unsigned long long ID_CLOSE = 40006;
+constexpr unsigned long long ID_EXIT = 40007;
 void tray()
 {
 	HWND hwnd;
@@ -353,6 +366,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		AppendMenuA(hMenu, MF_SEPARATOR, NULL, NULL); //水平线
 		AppendMenuA(hMenu, MF_STRING, ID_SEARCH, now_Window->Get_Window_HWND() == 0 ? no_Window_Text : have_Window_Text);
 		AppendMenuA(hMenu, MF_STRING, ID_CHANGE, "切换暂停");
+		AppendMenuA(hMenu, MF_STRING, ID_CLOSE, "关闭壁纸");
 		AppendMenuA(hMenu, MF_STRING, ID_EXIT, "退出");
 
 		Shell_NotifyIcon(NIM_ADD, &nid);
@@ -361,6 +375,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (lParam)
 		{
 		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
 		{
 			POINT pt;
 			GetCursorPos(&pt);
@@ -413,6 +428,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				pause_All_Window();
 				break;
 			}
+			case ID_CLOSE:
+			{
+				close_All_Window();
+				break;
+			}
 			case ID_EXIT:
 			{
 				running = false;
@@ -421,7 +441,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
-		case WM_RBUTTONDOWN:
+		case WM_MBUTTONDOWN:
 		{
 			//std::cout << "right pause\n";
 			pause_All_Window();
@@ -482,16 +502,28 @@ void loop()
 
 		update_All_Window();
 
-		HWND active_HWND = GetForegroundWindow();
-		RECT active_Rect;
-		unsigned int mul = 0;
+		static HWND active_HWND;
+		static RECT active_Rect;
+		static unsigned int mul = 0;
+		static unsigned char continues = 0;
+		static bool target_State = 0;
+
+		active_HWND = GetForegroundWindow();
+
 		if (active_HWND != Window_Infomation::Get_W12_Window_HWND(1) && active_HWND != Window_Infomation::Get_W12_Window_HWND(2))
 		{
 			GetWindowRect(active_HWND, &active_Rect);
 			mul = (active_Rect.right - active_Rect.left) * (active_Rect.bottom - active_Rect.top);
 		}
-		if (mul > target_Screen_Pixels != paused)
-			pause_All_Window(); //占比大和暂停不相同时调用
+		else mul = 0;
+
+		target_State = mul > target_Screen_Pixels;
+
+		if (target_State != paused) continues++; //要变
+		else continues = 0; //相同置零
+
+		if (continues > continue_Time[target_State])
+			pause_All_Window(); //达到预计时间
 		//else
 		//	std::cout << "now " << (paused ? "paused" : "play") << endl;
 	}

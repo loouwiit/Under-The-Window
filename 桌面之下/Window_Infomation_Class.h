@@ -20,7 +20,7 @@ public:
 	void Update_Is_ffplay_Window();
 	//bool Is_Pause();
 	//void Set_Pause(bool Flag);
-	void Pause_ffplay();
+	void Send_Message(char Key, unsigned long lParam);
 
 	void Update_Infomation();
 	RECT& Get_Infomation();

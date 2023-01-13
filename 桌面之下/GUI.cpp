@@ -350,10 +350,17 @@ void Print()
 
 		if (Changing_Position)
 			Text[10].setString(L"更改位置");
-		else if (Now_Window->Is_Undered())
-			Text[10].setString(L"恢复窗口");
+		else if (Now_Window->Is_ffplay_Window())
+		{
+			Text[10].setString(L"关闭壁纸"); //1.0.3.19
+		}
 		else
-			Text[10].setString(L"移到桌面之下");
+		{
+			if (Now_Window->Is_Undered())
+				Text[10].setString(L"恢复窗口");
+			else
+				Text[10].setString(L"移到桌面之下");
+		}
 
 		/*
 		if (Keep_Undered)
@@ -661,6 +668,7 @@ void Event(bool Flag)
 							{
 								//且当前是0-->搜索PM窗口
 								Get_Child_Window(Now_Window);//获取并链接PM子窗口
+								Update_Draw = true; //1.0.3.19
 							}
 						}
 					}//右侧
@@ -699,7 +707,7 @@ void Event(bool Flag)
 				}
 				case 5:
 				{
-					//设置桌面之下、移动窗口和保持桌面之下
+					//设置桌面之下、移动窗口、关闭壁纸和保持桌面之下
 					Input_Position = ENUM::Input_Position::INP_NULL;//输入模式归位
 					if (Event.mouseButton.x < Window.getSize().x * 0.33)
 					{
@@ -716,6 +724,12 @@ void Event(bool Flag)
 							//1.0.3.9表示我不理解这玩意干啥的
 							Update_Draw = true;
 						}
+						else if (Now_Window->Is_ffplay_Window())
+						{
+							//1.0.3.19
+							Now_Window->Send_Message(VK_ESCAPE,0x00010001);
+							Update_Draw = true; //窗口不存在，需要重新渲染
+						}
 						else
 						{
 							//桌面之下
@@ -729,7 +743,7 @@ void Event(bool Flag)
 						//Keep_Under();//保持之下 1.0.2.5删除
 						//Record();//1.0.3.14试图添加
 						if (Now_Window->Is_ffplay_Window())//1.0.3.16加入
-							Now_Window->Pause_ffplay();
+							Now_Window->Send_Message(VK_SPACE,0x00390001);
 						else
 							Now_Window->Update_Is_ffplay_Window();
 					}

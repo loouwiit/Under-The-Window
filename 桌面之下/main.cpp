@@ -384,7 +384,15 @@ BOOL CALLBACK Enum_Child_Widow(HWND Window_HWND, LPARAM lparam)
 		{
 			return TRUE;//直接返回
 		}
-		//没有重复的->创建连接
+		//没有重复的
+		
+		if (Now_Window_ptr->Get_Window_HWND() == 0)
+		{
+			//空，直接写入
+			Now_Window_ptr->Set_Window_HWND(Window_HWND);
+		}
+
+		//非空->创建连接
 
 		Window_Infomation* Temp_Window_ptr = new Window_Infomation(Window_HWND);//隐含Update_HWND和Update_Infomation
 
