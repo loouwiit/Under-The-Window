@@ -1,0 +1,14 @@
+创建6.mp4的00时00分00.1秒的截图保存到./out.png
+ffmpeg -ss 00:00:00.1 -i .\6.mp4 -f image2 -y ./out.png
+
+压缩.\6.mp4（4000k的码率、帧率30、分辨率1920x1080）到.\out.mp4
+ffmpeg -i .\6.mp4 -r 30 -b:v 4000k -s 1920x1080 -vcodec h264 ..\out.mp4
+
+播放.\6.mp4。无边框，640x480，循环，取消日志，静音，自动丢帧，窗口名为Wallpaper，按下鼠标、键盘时退出
+ffplay .\6.mp4 -noborder -x 640 -y 480 -loop 0 -loglevel quiet -an -framedrop -window_title Wallpaper -exitonmousedown -exitonkeydown
+
+指定解码器参数：-vcodec 解码器
+获取解码器：ffplay -decoders
+
+剪辑视频：INPUT.mp4从10秒处剪30秒到OUT.mp4（由于-codec copy参数可能导致时间不准，可以去掉）
+ffmpeg -ss 0:0:10 -t 0:0:30 -i .\INPUT.mp4 -codec copy  -y OUT.mp4

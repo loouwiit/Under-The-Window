@@ -1,0 +1,4 @@
+version=1;
+whiteList=任务视图;
+blackList=游戏窗口名;
+end

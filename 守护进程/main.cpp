@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <Windows.h>
 #include "Window_Infomation_Class.h"
 #include "resource.h"
@@ -13,8 +14,12 @@
 /*
 * 0.0.0.1 初号版本 跟随1.0.3.18
 * 0.0.0.2 添加关闭功能 右键功能同左键 中键功能为切换 修改暂停机制，暂停需要超过81%持续5秒，恢复需要2秒 跟随1.0.3.19
+* 0.0.0.3 添加白名单和黑名单 2023/1/14
+* 
 * next
 */
+
+#define	Message(STRING) MessageBox(NULL, STRING, L"守护进程", MB_YESNO)
 
 struct Window_And_HWND
 {
@@ -22,9 +27,11 @@ struct Window_And_HWND
 	HWND Window_HWND;
 };
 
+constexpr char Progream_Version[] = "0.0.0.2";
+constexpr unsigned File_Version = 1;
+constexpr char List_Path[] = ".\\桌面之下\\list.txt";
 constexpr unsigned int update_Time = 1;
 constexpr unsigned int continue_Time[2] = { 2,5 }; //恢复和暂停
-constexpr char Progream_Version[] = "0.0.0.2";
 constexpr char endl = '\n';
 constexpr bool Ignore_Other_Window = true;
 #ifdef _DEBUG
@@ -40,6 +47,10 @@ constexpr float Target_Screen_Rate = 0.81f;
 Window_Infomation* now_Window = nullptr;
 time_t next_Time = 0;
 HWND Console_HWND = 0;
+char** black_List = nullptr;
+char** white_List = nullptr;
+unsigned black_List_Number = 0;
+unsigned white_List_Number = 0;
 unsigned target_Screen_Pixels = 0;
 bool running = true;
 bool auto_Pause = true;
@@ -48,6 +59,8 @@ bool paused = false;
 
 void Initialize();
 void Enetialize();
+void Save_List(const char Path[]);
+void Load_List(const char Path[]);
 
 void update_All_Window();
 void pause_All_Window();
@@ -56,6 +69,8 @@ void Repair_W1_W2_Error(Window_Infomation* Window_Infomation_ptr);
 void Get_Child_Window(Window_Infomation* Window_Infomation_ptr, HWND Parent_Window_WHND = Window_Infomation::Get_PM_Window_HWND());//枚举并连接PM的子窗口
 BOOL CALLBACK Enum_Child_Widow(HWND Window_HWND, LPARAM lparam);//枚举的回调函数
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);//子菜单的回调函数
+bool string_Compere(const char STR1[], const char STR2[]);
+bool text_In(const char string[], char** string_List, unsigned list_Count);
 void tray();
 void update_Menu(HWND hwnd);
 void loop();
@@ -102,21 +117,137 @@ void Initialize()
 		delete now_Window->Get_Last_Window_ptr();
 		now_Window->Set_Last_Window_ptr(nullptr);
 	}
+
+	Load_List(List_Path);
 }
 
 void Enetialize()
 {
 	//if (paused) pause_All_Window();
+	Save_List(List_Path);
 #ifdef _DEBUG
 	system("pause");
 #endif
+}
+
+void Save_List(const char Path[])
+{
+	std::ofstream file;
+	file.open(Path);
+	if (!file.is_open())
+	{
+		system("md 桌面之下");
+		file.open(Path);
+
+		if (!file.is_open())
+		{
+			Message(L"写入文件失败");
+			return;
+		}
+	}
+
+	file << "version=" << File_Version << ';' << endl;
+	for (unsigned i = 0; i < white_List_Number; i++)
+		file << "whitekList=" << white_List[i] << ';' << endl;
+	for (unsigned i = 0; i < black_List_Number; i++)
+		file << "blackList=" << black_List[i] << ';' << endl;
+	file << "end" << endl;
+}
+
+void Load_List(const char Path[])
+{
+	std::ifstream file;
+	char buffer[500] = "";
+	std::streampos position = 0;
+
+	file.open(Path);
+	if (!file.is_open()) return;
+
+	file.getline(buffer, sizeof(buffer), '=');
+
+	if (string_Compere(buffer, "version="))
+	{
+		file.getline(buffer, ';');
+		if (atoi(buffer) != File_Version)
+		{
+			//版本异常
+			if (Message(L"文件版本异常，是否重新写入？") == IDYES)
+			{
+				Save_List(Path);
+			}
+			file.close();
+			return;
+		}
+	}
+	else
+	{
+		//文件异常
+		if (Message(L"文件异常，是否重新写入？") == IDYES)
+		{
+			Save_List(Path);
+		}
+		file.close();
+		return;
+	}
+
+	position = file.tellg();
+	while (true)
+	{
+		file.getline(buffer, sizeof(buffer), '=');
+
+		if (string_Compere(buffer, "whiteList")) white_List_Number++;
+		else if (string_Compere(buffer, "blackList")) black_List_Number++;
+		else if (string_Compere(buffer, "end")) break;
+
+		file.ignore(0xFFFF, ';');
+	}
+
+	white_List = new char* [white_List_Number];
+	black_List = new char* [black_List_Number];
+	unsigned now_white = 0;
+	unsigned now_black = 0;
+
+	file.seekg(position);
+	while (true)
+	{
+		file.getline(buffer, sizeof(buffer), '=');
+
+		if (string_Compere(buffer, "whiteList"))
+		{
+			file.getline(buffer, sizeof(buffer), ';');
+
+			size_t size = strlen(buffer) + 1;
+			white_List[now_white] = new char[size];
+			strcpy_s(white_List[now_white], size, buffer);
+			now_white++;
+		}
+
+		else if (string_Compere(buffer, "blackList"))
+		{
+			file.getline(buffer, sizeof(buffer), ';');
+
+			size_t size = strlen(buffer) + 1;
+			black_List[now_black] = new char[size];
+			strcpy_s(black_List[now_black], size, buffer);
+			now_black++;
+		}
+
+		else if (string_Compere(buffer, "end"))
+		{
+			break;
+		}
+	}
+
+	file.close();
+	return;
 }
 
 
 void update_All_Window()
 {
 	//退回最前
-	Window_Infomation* temp = now_Window;
+	static Window_Infomation* temp;
+	temp = now_Window;
 	while (temp->Get_Last_Window_ptr() != nullptr) temp = temp->Get_Last_Window_ptr();
 
 	//输出所有窗口
@@ -468,6 +599,36 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
+bool string_Compere(const char STR1[], const char STR2[])
+{
+	unsigned i = 0;
+	unsigned j = 0;
+
+	while (STR1[i] == ' ' || STR1[i] == '\n') i++;
+	while (STR2[j] == ' ' || STR2[j] == '\n') j++;
+
+	while (STR1[i] != '\0' && STR2[j] != '\0')
+	{
+		if (STR1[i] != STR2[j]) return false; //比较
+		i++;
+		j++;
+		while (STR1[i] == ' ' || STR1[i] == '\n') i++;//排除空格
+		while (STR2[j] == ' ' || STR2[j] == '\n') j++;
+	}
+
+	return true;
+}
+
+bool text_In(const char string[], char** string_List, unsigned list_Count)
+{
+	for (unsigned i = 0; i < list_Count; i++)
+	{
+		if (0 == strcmp(string, string_List[i]))
+			return true;
+	}
+	return false;
+}
+
 void update_Menu(HWND hwnd)
 {
 	MENUITEMINFO info;
@@ -507,17 +668,29 @@ void loop()
 		static unsigned int mul = 0;
 		static unsigned char continues = 0;
 		static bool target_State = 0;
+		static char buffer[100] = "";
 
 		active_HWND = GetForegroundWindow();
-
-		if (active_HWND != Window_Infomation::Get_W12_Window_HWND(1) && active_HWND != Window_Infomation::Get_W12_Window_HWND(2))
+		GetWindowTextA(active_HWND, buffer, sizeof(buffer));
+		
+		if (text_In(buffer, black_List, black_List_Number))
 		{
+			//黑名单
+			mul = target_Screen_Pixels;
+		}
+		else if (text_In(buffer, white_List, white_List_Number))
+		{
+			//白名单
+			mul = 0;
+		}
+		else
+		{
+			//剩下的
 			GetWindowRect(active_HWND, &active_Rect);
 			mul = (active_Rect.right - active_Rect.left) * (active_Rect.bottom - active_Rect.top);
 		}
-		else mul = 0;
 
-		target_State = mul > target_Screen_Pixels;
+		target_State = mul >= target_Screen_Pixels;
 
 		if (target_State != paused) continues++; //要变
 		else continues = 0; //相同置零
