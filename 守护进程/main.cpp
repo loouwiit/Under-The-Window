@@ -202,8 +202,8 @@ void Load_List(const char Path[])
 		file.ignore(0xFFFF, ';');
 	}
 
-	white_List = new char* [white_List_Number]; //char* []是指针？谁与谁结合？是指针的数组还是数组的指针？
-	black_List = new char* [black_List_Number]; //或许需要（char*）[number]，要不直接void*自己算大小。
+	white_List = new char* [white_List_Number];
+	black_List = new char* [black_List_Number];
 	unsigned now_white = 0;
 	unsigned now_black = 0;
 
