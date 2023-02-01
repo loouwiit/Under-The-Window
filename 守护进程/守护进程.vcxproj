@@ -154,6 +154,9 @@
   <ItemGroup>
     <Image Include="守护进程.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="桌面之下\list.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

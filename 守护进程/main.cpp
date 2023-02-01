@@ -14,7 +14,9 @@
 /*
 * 0.0.0.1 初号版本 跟随1.0.3.18
 * 0.0.0.2 添加关闭功能 右键功能同左键 中键功能为切换 修改暂停机制，暂停需要超过81%持续5秒，恢复需要2秒 跟随1.0.3.19
-* 0.0.0.3 添加白名单和黑名单 2023/1/14
+* 0.0.0.3 添加白名单和黑名单 （遗忘添加版本号） 2023/1/14
+* 0.0.0.4 修复隐藏控制台后不恢复的bug 2023/1/14
+* 0.0.0.5 修复保存白名单时错误的问题 修复读取错误数值后死循环的bug 2023/2/1
 * 
 * next
 */
@@ -27,7 +29,7 @@ struct Window_And_HWND
 	HWND Window_HWND;
 };
 
-constexpr char Progream_Version[] = "0.0.0.2";
+constexpr char Progream_Version[] = "0.0.0.5";
 constexpr unsigned File_Version = 1;
 constexpr char List_Path[] = ".\\桌面之下\\list.txt";
 constexpr unsigned int update_Time = 1;
@@ -47,6 +49,7 @@ constexpr float Target_Screen_Rate = 0.81f;
 Window_Infomation* now_Window = nullptr;
 time_t next_Time = 0;
 HWND Console_HWND = 0;
+char null_List_char[] = "null";
 char** black_List = nullptr;
 char** white_List = nullptr;
 unsigned black_List_Number = 0;
@@ -123,6 +126,7 @@ void Initialize()
 
 void Enetialize()
 {
+	if (Console_HWND != NULL && !Show_Console) ShowWindow(Console_HWND, SW_SHOW);//恢复窗口
 	//if (paused) pause_All_Window();
 	Save_List(List_Path);
 #ifdef _DEBUG
@@ -148,7 +152,7 @@ void Save_List(const char Path[])
 
 	file << "version=" << File_Version << ';' << endl;
 	for (unsigned i = 0; i < white_List_Number; i++)
-		file << "whitekList=" << white_List[i] << ';' << endl;
+		file << "whiteList=" << white_List[i] << ';' << endl;
 	for (unsigned i = 0; i < black_List_Number; i++)
 		file << "blackList=" << black_List[i] << ';' << endl;
 	file << "end" << endl;
@@ -171,22 +175,22 @@ void Load_List(const char Path[])
 		if (atoi(buffer) != File_Version)
 		{
 			//版本异常
+			file.close();
 			if (Message(L"文件版本异常，是否重新写入？") == IDYES)
 			{
 				Save_List(Path);
 			}
-			file.close();
 			return;
 		}
 	}
 	else
 	{
 		//文件异常
+		file.close();
 		if (Message(L"文件异常，是否重新写入？") == IDYES)
 		{
 			Save_List(Path);
 		}
-		file.close();
 		return;
 	}
 
@@ -198,12 +202,19 @@ void Load_List(const char Path[])
 		if (string_Compere(buffer, "whiteList")) white_List_Number++;
 		else if (string_Compere(buffer, "blackList")) black_List_Number++;
 		else if (string_Compere(buffer, "end")) break;
+		else if (file.eof())
+		{
+			file.clear();
+			break;
+		}
 
 		file.ignore(0xFFFF, ';');
 	}
 
 	white_List = new char* [white_List_Number];
 	black_List = new char* [black_List_Number];
+	for (unsigned i = 0; i < white_List_Number; i++) white_List[i] = null_List_char; //可以不用，但是留着吧，增强鲁棒性
+	for (unsigned i = 0; i < black_List_Number; i++) black_List[i] = null_List_char;
 	unsigned now_white = 0;
 	unsigned now_black = 0;
 
@@ -217,7 +228,7 @@ void Load_List(const char Path[])
 			file.getline(buffer, sizeof(buffer), ';');
 
 			size_t size = strlen(buffer) + 1;
-			white_List[now_white] = new char[size];
+			white_List[now_white] = new char[size]; //忽略此处的C6386和C6385，缓冲区大小是经过统计的，不会溢出
 			strcpy_s(white_List[now_white], size, buffer);
 			now_white++;
 		}
@@ -227,7 +238,7 @@ void Load_List(const char Path[])
 			file.getline(buffer, sizeof(buffer), ';');
 
 			size_t size = strlen(buffer) + 1;
-			black_List[now_black] = new char[size];
+			black_List[now_black] = new char[size]; //忽略此处的C6386和C6385，缓冲区大小是经过统计的，不会溢出
 			strcpy_s(black_List[now_black], size, buffer);
 			now_black++;
 		}
@@ -235,6 +246,17 @@ void Load_List(const char Path[])
 		else if (string_Compere(buffer, "end"))
 		{
 			break;
+		}
+
+		else //未知数据
+		{
+			//文件结束
+			if (file.eof())
+				break;
+
+			//错误数值
+			Message(L"存在未知数值，请检查配置文件");
+			file.ignore(0xFFFF, ';');
 		}
 	}
 
@@ -473,7 +495,7 @@ void tray()
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	NOTIFYICONDATA nid;
+	NOTIFYICONDATA nid = { NULL };
 	UINT WM_TASKBARCREATED;
 
 	// 不要修改TaskbarCreated，这是系统任务栏自定义的消息
