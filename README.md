@@ -1,8 +1,6 @@
 # 桌面之下
 下载: <br>
-<a href="https://github.com/loouwiit/Under-The-Window/blob/master/%E7%94%9F%E6%88%90/old/1.0.3.19%2B0.0.0.2.zip">1.0.3.19+0.0.0.2</a> <br/>
-0.0.0.3不稳定，请用0.0.0.2<br/>
-<a href="https://github.com/loouwiit/Under-The-Window/blob/master/%E7%94%9F%E6%88%90/%E5%AE%88%E6%8A%A4%E7%BA%BF%E7%A8%8B%20%5B0.0.0.3%5D.zip">守护进程 [0.0.0.3]</a> <br>
+<a href="https://github.com/loouwiit/Under-The-Window/blob/master/%E7%94%9F%E6%88%90/%E5%AE%88%E6%8A%A4%E7%BA%BF%E7%A8%8B%20%5B0.0.0.5%5D.zip">守护进程 [0.0.0.5]</a> <br>
 <a href="https://github.com/loouwiit/Under-The-Window/blob/master/%E7%94%9F%E6%88%90/%E6%A1%8C%E9%9D%A2%E4%B9%8B%E4%B8%8B%20%5B1.0.3.19%5D.zip">桌面之下 [1.0.3.19]</a> <br>
 <br/>
 setting.txt:<br/>
@@ -18,9 +16,9 @@ setting.txt:<br/>
 |　…… <br/>
  <br/>
  list.txt:<br/>
- |　version=文件版本 <br/>
- |　blackList=黑名单窗口标题 <br/>
- |　whiteList=白名单窗口标题 <br/>
+ |　version=文件版本; <br/>
+ |　blackList=黑名单窗口标题; <br/>
+ |　whiteList=白名单窗口标题; <br/>
  |　…… <br/>
  | end <br/>
  <br/>
