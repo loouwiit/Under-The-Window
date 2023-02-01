@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <fstream>
 #include <Windows.h>
 #include "Window_Infomation_Class.h"
@@ -7,21 +7,21 @@
 //#include "Operator.h"
 
 /*
-* ÊØ»¤½ø³Ì
-* µ±ÓÃ»§¿´²»µ½±ÚÖ½Ê±ÔİÍ£ffplay´°¿Ú
+* å®ˆæŠ¤è¿›ç¨‹
+* å½“ç”¨æˆ·çœ‹ä¸åˆ°å£çº¸æ—¶æš‚åœffplayçª—å£
 */
 
 /*
-* 0.0.0.1 ³õºÅ°æ±¾ ¸úËæ1.0.3.18
-* 0.0.0.2 Ìí¼Ó¹Ø±Õ¹¦ÄÜ ÓÒ¼ü¹¦ÄÜÍ¬×ó¼ü ÖĞ¼ü¹¦ÄÜÎªÇĞ»» ĞŞ¸ÄÔİÍ£»úÖÆ£¬ÔİÍ£ĞèÒª³¬¹ı81%³ÖĞø5Ãë£¬»Ö¸´ĞèÒª2Ãë ¸úËæ1.0.3.19
-* 0.0.0.3 Ìí¼Ó°×Ãûµ¥ºÍºÚÃûµ¥ £¨ÒÅÍüÌí¼Ó°æ±¾ºÅ£© 2023/1/14
-* 0.0.0.4 ĞŞ¸´Òş²Ø¿ØÖÆÌ¨ºó²»»Ö¸´µÄbug 2023/1/14
-* 0.0.0.5 ĞŞ¸´±£´æ°×Ãûµ¥Ê±´íÎóµÄÎÊÌâ ĞŞ¸´¶ÁÈ¡´íÎóÊıÖµºóËÀÑ­»·µÄbug 2023/2/1
+* 0.0.0.1 åˆå·ç‰ˆæœ¬ è·Ÿéš1.0.3.18
+* 0.0.0.2 æ·»åŠ å…³é—­åŠŸèƒ½ å³é”®åŠŸèƒ½åŒå·¦é”® ä¸­é”®åŠŸèƒ½ä¸ºåˆ‡æ¢ ä¿®æ”¹æš‚åœæœºåˆ¶ï¼Œæš‚åœéœ€è¦è¶…è¿‡81%æŒç»­5ç§’ï¼Œæ¢å¤éœ€è¦2ç§’ è·Ÿéš1.0.3.19
+* 0.0.0.3 æ·»åŠ ç™½åå•å’Œé»‘åå• ï¼ˆé—å¿˜æ·»åŠ ç‰ˆæœ¬å·ï¼‰ 2023/1/14
+* 0.0.0.4 ä¿®å¤éšè—æ§åˆ¶å°åä¸æ¢å¤çš„bug 2023/1/14
+* 0.0.0.5 ä¿®å¤ä¿å­˜ç™½åå•æ—¶é”™è¯¯çš„é—®é¢˜ ä¿®å¤è¯»å–é”™è¯¯æ•°å€¼åæ­»å¾ªç¯çš„bug 2023/2/1
 * 
 * next
 */
 
-#define	Message(STRING) MessageBox(NULL, STRING, L"ÊØ»¤½ø³Ì", MB_YESNO)
+#define	Message(STRING) MessageBox(NULL, STRING, L"å®ˆæŠ¤è¿›ç¨‹", MB_YESNO)
 
 struct Window_And_HWND
 {
@@ -31,9 +31,9 @@ struct Window_And_HWND
 
 constexpr char Progream_Version[] = "0.0.0.5";
 constexpr unsigned File_Version = 1;
-constexpr char List_Path[] = ".\\×ÀÃæÖ®ÏÂ\\list.txt";
+constexpr char List_Path[] = ".\\æ¡Œé¢ä¹‹ä¸‹\\list.txt";
 constexpr unsigned int update_Time = 1;
-constexpr unsigned int continue_Time[2] = { 2,5 }; //»Ö¸´ºÍÔİÍ£
+constexpr unsigned int continue_Time[2] = { 2,5 }; //æ¢å¤å’Œæš‚åœ
 constexpr char endl = '\n';
 constexpr bool Ignore_Other_Window = true;
 #ifdef _DEBUG
@@ -69,9 +69,9 @@ void update_All_Window();
 void pause_All_Window();
 void close_All_Window();
 void Repair_W1_W2_Error(Window_Infomation* Window_Infomation_ptr);
-void Get_Child_Window(Window_Infomation* Window_Infomation_ptr, HWND Parent_Window_WHND = Window_Infomation::Get_PM_Window_HWND());//Ã¶¾Ù²¢Á¬½ÓPMµÄ×Ó´°¿Ú
-BOOL CALLBACK Enum_Child_Widow(HWND Window_HWND, LPARAM lparam);//Ã¶¾ÙµÄ»Øµ÷º¯Êı
-LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);//×Ó²Ëµ¥µÄ»Øµ÷º¯Êı
+void Get_Child_Window(Window_Infomation* Window_Infomation_ptr, HWND Parent_Window_WHND = Window_Infomation::Get_PM_Window_HWND());//æšä¸¾å¹¶è¿æ¥PMçš„å­çª—å£
+BOOL CALLBACK Enum_Child_Widow(HWND Window_HWND, LPARAM lparam);//æšä¸¾çš„å›è°ƒå‡½æ•°
+LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);//å­èœå•çš„å›è°ƒå‡½æ•°
 bool string_Compere(const char STR1[], const char STR2[]);
 bool text_In(const char string[], char** string_List, unsigned list_Count);
 void tray();
@@ -93,29 +93,29 @@ void Initialize()
 {
 	std::cout << Progream_Version << endl;
 #ifdef _DEBUG
-	std::cout << "Debug°æ±¾" << endl;
+	std::cout << "Debugç‰ˆæœ¬" << endl;
 #endif // _DEBUG
 #ifndef _WIN64
-	std::cout << "32Î»°æ±¾" << endl;
+	std::cout << "32ä½ç‰ˆæœ¬" << endl;
 #endif // _WIN64
 
-	Console_HWND = FindWindow(L"ConsoleWindowClass", NULL);//»ñÈ¡¾ä±ú
-	if (Console_HWND != NULL && !Show_Console) ShowWindow(Console_HWND, SW_HIDE);//Òş²Ø´°¿Ú
+	Console_HWND = FindWindow(L"ConsoleWindowClass", NULL);//è·å–å¥æŸ„
+	if (Console_HWND != NULL && !Show_Console) ShowWindow(Console_HWND, SW_HIDE);//éšè—çª—å£
 	Window_Infomation::Set_Self_Window_Exist(false);
 
 	int desktop_Size[2] = { 0,0 };
 	Window_Infomation::Get_Desktop_Size(desktop_Size[0], desktop_Size[1]);
 	target_Screen_Pixels = (unsigned int)(desktop_Size[0] * desktop_Size[1] * Target_Screen_Rate);
 
-	Window_Infomation::Set_Self_Window_Exist(false);//²»´æÔÚ´°¿Ú
+	Window_Infomation::Set_Self_Window_Exist(false);//ä¸å­˜åœ¨çª—å£
 	now_Window = new Window_Infomation;
-	Get_Child_Window(now_Window); //¶ÁÈ¡È«²¿´°¿Ú
+	Get_Child_Window(now_Window); //è¯»å–å…¨éƒ¨çª—å£
 
-	//ÍË»Ø×îÇ°
+	//é€€å›æœ€å‰
 	while (now_Window->Get_Last_Window_ptr() != nullptr) now_Window = now_Window->Get_Last_Window_ptr();
 	if (now_Window->Get_Window_HWND() == 0 && now_Window->Get_Next_Window_ptr() != nullptr)
 	{
-		//É¾³ı0
+		//åˆ é™¤0
 		now_Window = now_Window->Get_Next_Window_ptr();
 		delete now_Window->Get_Last_Window_ptr();
 		now_Window->Set_Last_Window_ptr(nullptr);
@@ -126,7 +126,7 @@ void Initialize()
 
 void Enetialize()
 {
-	if (Console_HWND != NULL && !Show_Console) ShowWindow(Console_HWND, SW_SHOW);//»Ö¸´´°¿Ú
+	if (Console_HWND != NULL && !Show_Console) ShowWindow(Console_HWND, SW_SHOW);//æ¢å¤çª—å£
 	//if (paused) pause_All_Window();
 	Save_List(List_Path);
 #ifdef _DEBUG
@@ -140,12 +140,12 @@ void Save_List(const char Path[])
 	file.open(Path);
 	if (!file.is_open())
 	{
-		system("md ×ÀÃæÖ®ÏÂ");
+		system("md æ¡Œé¢ä¹‹ä¸‹");
 		file.open(Path);
 
 		if (!file.is_open())
 		{
-			Message(L"Ğ´ÈëÎÄ¼şÊ§°Ü");
+			Message(L"å†™å…¥æ–‡ä»¶å¤±è´¥");
 			return;
 		}
 	}
@@ -174,9 +174,9 @@ void Load_List(const char Path[])
 		file.getline(buffer, ';');
 		if (atoi(buffer) != File_Version)
 		{
-			//°æ±¾Òì³£
+			//ç‰ˆæœ¬å¼‚å¸¸
 			file.close();
-			if (Message(L"ÎÄ¼ş°æ±¾Òì³££¬ÊÇ·ñÖØĞÂĞ´Èë£¿") == IDYES)
+			if (Message(L"æ–‡ä»¶ç‰ˆæœ¬å¼‚å¸¸ï¼Œæ˜¯å¦é‡æ–°å†™å…¥ï¼Ÿ") == IDYES)
 			{
 				Save_List(Path);
 			}
@@ -185,9 +185,9 @@ void Load_List(const char Path[])
 	}
 	else
 	{
-		//ÎÄ¼şÒì³£
+		//æ–‡ä»¶å¼‚å¸¸
 		file.close();
-		if (Message(L"ÎÄ¼şÒì³££¬ÊÇ·ñÖØĞÂĞ´Èë£¿") == IDYES)
+		if (Message(L"æ–‡ä»¶å¼‚å¸¸ï¼Œæ˜¯å¦é‡æ–°å†™å…¥ï¼Ÿ") == IDYES)
 		{
 			Save_List(Path);
 		}
@@ -213,7 +213,7 @@ void Load_List(const char Path[])
 
 	white_List = new char* [white_List_Number];
 	black_List = new char* [black_List_Number];
-	for (unsigned i = 0; i < white_List_Number; i++) white_List[i] = null_List_char; //¿ÉÒÔ²»ÓÃ£¬µ«ÊÇÁô×Å°É£¬ÔöÇ¿Â³°ôĞÔ
+	for (unsigned i = 0; i < white_List_Number; i++) white_List[i] = null_List_char; //å¯ä»¥ä¸ç”¨ï¼Œä½†æ˜¯ç•™ç€å§ï¼Œå¢å¼ºé²æ£’æ€§
 	for (unsigned i = 0; i < black_List_Number; i++) black_List[i] = null_List_char;
 	unsigned now_white = 0;
 	unsigned now_black = 0;
@@ -228,7 +228,7 @@ void Load_List(const char Path[])
 			file.getline(buffer, sizeof(buffer), ';');
 
 			size_t size = strlen(buffer) + 1;
-			white_List[now_white] = new char[size]; //ºöÂÔ´Ë´¦µÄC6386ºÍC6385£¬»º³åÇø´óĞ¡ÊÇ¾­¹ıÍ³¼ÆµÄ£¬²»»áÒç³ö
+			white_List[now_white] = new char[size]; //å¿½ç•¥æ­¤å¤„çš„C6386å’ŒC6385ï¼Œç¼“å†²åŒºå¤§å°æ˜¯ç»è¿‡ç»Ÿè®¡çš„ï¼Œä¸ä¼šæº¢å‡º
 			strcpy_s(white_List[now_white], size, buffer);
 			now_white++;
 		}
@@ -238,7 +238,7 @@ void Load_List(const char Path[])
 			file.getline(buffer, sizeof(buffer), ';');
 
 			size_t size = strlen(buffer) + 1;
-			black_List[now_black] = new char[size]; //ºöÂÔ´Ë´¦µÄC6386ºÍC6385£¬»º³åÇø´óĞ¡ÊÇ¾­¹ıÍ³¼ÆµÄ£¬²»»áÒç³ö
+			black_List[now_black] = new char[size]; //å¿½ç•¥æ­¤å¤„çš„C6386å’ŒC6385ï¼Œç¼“å†²åŒºå¤§å°æ˜¯ç»è¿‡ç»Ÿè®¡çš„ï¼Œä¸ä¼šæº¢å‡º
 			strcpy_s(black_List[now_black], size, buffer);
 			now_black++;
 		}
@@ -248,14 +248,14 @@ void Load_List(const char Path[])
 			break;
 		}
 
-		else //Î´ÖªÊı¾İ
+		else //æœªçŸ¥æ•°æ®
 		{
-			//ÎÄ¼ş½áÊø
+			//æ–‡ä»¶ç»“æŸ
 			if (file.eof())
 				break;
 
-			//´íÎóÊıÖµ
-			Message(L"´æÔÚÎ´ÖªÊıÖµ£¬Çë¼ì²éÅäÖÃÎÄ¼ş");
+			//é”™è¯¯æ•°å€¼
+			Message(L"å­˜åœ¨æœªçŸ¥æ•°å€¼ï¼Œè¯·æ£€æŸ¥é…ç½®æ–‡ä»¶");
 			file.ignore(0xFFFF, ';');
 		}
 	}
@@ -267,12 +267,12 @@ void Load_List(const char Path[])
 
 void update_All_Window()
 {
-	//ÍË»Ø×îÇ°
+	//é€€å›æœ€å‰
 	static Window_Infomation* temp;
 	temp = now_Window;
 	while (temp->Get_Last_Window_ptr() != nullptr) temp = temp->Get_Last_Window_ptr();
 
-	//Êä³öËùÓĞ´°¿Ú
+	//è¾“å‡ºæ‰€æœ‰çª—å£
 	while (temp != nullptr)
 	{
 		temp->Update_Window_HWND();
@@ -290,7 +290,7 @@ void update_All_Window()
 				now_Window->Set_Window_HWND(0);
 
 			if (now_Window->Get_Next_Window_ptr() == nullptr)
-				break;//×îºóÒ»¸ö£¬Ö±½ÓÌø³öÑ­»·
+				break;//æœ€åä¸€ä¸ªï¼Œç›´æ¥è·³å‡ºå¾ªç¯
 
 			Window_Infomation* delete_Window = temp;
 
@@ -338,20 +338,20 @@ void Repair_W1_W2_Error(Window_Infomation* Window_Infomation_ptr)
 		return;
 	}
 
-	if (!Window_Infomation::Get_W1_W2_Error()) return;//Ã»ÓĞ´íÎó
+	if (!Window_Infomation::Get_W1_W2_Error()) return;//æ²¡æœ‰é”™è¯¯
 
-	Window_Infomation::Hide_PM_W2_Window();//Òş²ØW2
-	//±éÀúÈ«²¿
+	Window_Infomation::Hide_PM_W2_Window();//éšè—W2
+	//éå†å…¨éƒ¨
 	for (Window_Infomation_ptr = now_Window; Window_Infomation_ptr != nullptr;
 		Window_Infomation_ptr = Window_Infomation_ptr->Get_Last_Window_ptr())
 	{
-		//×Ô¼º¼°×ó±ß
+		//è‡ªå·±åŠå·¦è¾¹
 		Window_Infomation_ptr->Repair_W1_W2();
 	}
 	for (Window_Infomation_ptr = now_Window->Get_Next_Window_ptr(); Window_Infomation_ptr != nullptr;
 		Window_Infomation_ptr = Window_Infomation_ptr->Get_Next_Window_ptr())
 	{
-		//ÓÒ±ß
+		//å³è¾¹
 		Window_Infomation_ptr->Repair_W1_W2();
 	}
 
@@ -360,7 +360,7 @@ void Repair_W1_W2_Error(Window_Infomation* Window_Infomation_ptr)
 
 void Get_Child_Window(Window_Infomation* Window_Infomation_ptr, HWND Parent_Window_HWND)
 {
-	//ÒÆµ½×îÇ°£¬Ìá¸ßĞÔÄÜ
+	//ç§»åˆ°æœ€å‰ï¼Œæé«˜æ€§èƒ½
 	while (Window_Infomation_ptr->Get_Last_Window_ptr() != nullptr)
 	{
 		Window_Infomation_ptr = Window_Infomation_ptr->Get_Last_Window_ptr();
@@ -372,58 +372,58 @@ void Get_Child_Window(Window_Infomation* Window_Infomation_ptr, HWND Parent_Wind
 
 BOOL CALLBACK Enum_Child_Widow(HWND Window_HWND, LPARAM lparam)
 {
-	if (GetAncestor(Window_HWND, GA_PARENT) == ((Window_And_HWND*)lparam)->Window_HWND) //×ÓÒ»´ú´°¿Ú¼ÇÂ¼
+	if (GetAncestor(Window_HWND, GA_PARENT) == ((Window_And_HWND*)lparam)->Window_HWND) //å­ä¸€ä»£çª—å£è®°å½•
 	{
-		//¼ÓÈëwindow¶ÓÁĞ
+		//åŠ å…¥windowé˜Ÿåˆ—
 		Window_Infomation* Now_Window_ptr = ((Window_And_HWND*)lparam)->Window_Infomation_ptr;
 
-		//²éÖØ ÒÆµ½×îÇ°
+		//æŸ¥é‡ ç§»åˆ°æœ€å‰
 		while (Now_Window_ptr->Get_Last_Window_ptr() != nullptr)
 		{
 			Now_Window_ptr = Now_Window_ptr->Get_Last_Window_ptr();
 		}
-		//±éÀúµ½×îºó
+		//éå†åˆ°æœ€å
 		while (Now_Window_ptr->Get_Next_Window_ptr() != nullptr)
 		{
 			if (Now_Window_ptr->Get_Window_HWND() == Window_HWND)
 			{
-				return TRUE;//Ö±½Ó·µ»Ø
+				return TRUE;//ç›´æ¥è¿”å›
 			}
 			Now_Window_ptr = Now_Window_ptr->Get_Next_Window_ptr();
 		}
-		//×îºóÒ»¸öÊÇ±éÀú²»ÉÏµÄ
+		//æœ€åä¸€ä¸ªæ˜¯éå†ä¸ä¸Šçš„
 		if (Now_Window_ptr->Get_Window_HWND() == Window_HWND)
 		{
-			return TRUE;//Ö±½Ó·µ»Ø
+			return TRUE;//ç›´æ¥è¿”å›
 		}
-		//Ã»ÓĞÖØ¸´µÄ->´´½¨Á¬½Ó
+		//æ²¡æœ‰é‡å¤çš„->åˆ›å»ºè¿æ¥
 
-		Window_Infomation* Temp_Window_ptr = new Window_Infomation(Window_HWND);//Òşº¬Update_HWNDºÍUpdate_Infomation
+		Window_Infomation* Temp_Window_ptr = new Window_Infomation(Window_HWND);//éšå«Update_HWNDå’ŒUpdate_Infomation
 
 		if (Ignore_Other_Window && !Temp_Window_ptr->Is_ffplay_Window())
 		{
-			//¿ÉÑ¡ÊÇ·ñ½öÏŞffplay´°¿Ú
+			//å¯é€‰æ˜¯å¦ä»…é™ffplayçª—å£
 			delete Temp_Window_ptr;
 			Temp_Window_ptr = nullptr;
 			return TRUE;
 		}
 
-		//Á¬½Ó
+		//è¿æ¥
 		Now_Window_ptr->Set_Next_Window_ptr(Temp_Window_ptr);
 		Temp_Window_ptr->Set_Last_Window_ptr(Now_Window_ptr);
 		Temp_Window_ptr = nullptr;
 	}
 
-	//Ã¶¾ÙÏÂÒ»¸ö
+	//æšä¸¾ä¸‹ä¸€ä¸ª
 	return TRUE;
 }
 
-LPCTSTR szAppName = TEXT("ÊØ»¤½ø³Ì");
+LPCTSTR szAppName = TEXT("å®ˆæŠ¤è¿›ç¨‹");
 LPCTSTR szWndName = TEXT("where is it?");
 HMENU hMenu = nullptr;
 HINSTANCE hInstance = 0;
-constexpr char no_Window_Text[] = "Î´ÕÒµ½´°¿Ú";
-constexpr char have_Window_Text[] = "ÒÑÕÒµ½´°¿Ú";
+constexpr char no_Window_Text[] = "æœªæ‰¾åˆ°çª—å£";
+constexpr char have_Window_Text[] = "å·²æ‰¾åˆ°çª—å£";
 constexpr unsigned long long ID_AUTO = 40001;
 constexpr unsigned long long ID_HPAUSE = 40002;
 constexpr unsigned long long ID_PAUSED = 40003;
@@ -444,7 +444,7 @@ void tray()
 	if (handle != NULL)
 	{
 		//MessageBox(NULL, TEXT("Application is already running"), szAppName, MB_ICONERROR);
-		MessageBox(NULL, TEXT("ÒÑÓĞÒ»¸öÊØ»¤Ïß³Ì"), szAppName, MB_ICONERROR);
+		MessageBox(NULL, TEXT("å·²æœ‰ä¸€ä¸ªå®ˆæŠ¤çº¿ç¨‹"), szAppName, MB_ICONERROR);
 		return;
 	}
 
@@ -462,11 +462,11 @@ void tray()
 	if (!RegisterClass(&wndclass))
 	{
 		//MessageBox(NULL, TEXT("This program requires Windows NT!"), szAppName, MB_ICONERROR);
-		MessageBox(NULL, TEXT("×¢²áÊ§°Ü"), szAppName, MB_ICONERROR);
+		MessageBox(NULL, TEXT("æ³¨å†Œå¤±è´¥"), szAppName, MB_ICONERROR);
 		return;
 	}
 
-	// ´Ë´¦Ê¹ÓÃWS_EX_TOOLWINDOW ÊôĞÔÀ´Òş²ØÏÔÊ¾ÔÚÈÎÎñÀ¸ÉÏµÄ´°¿Ú³ÌĞò°´Å¥
+	// æ­¤å¤„ä½¿ç”¨WS_EX_TOOLWINDOW å±æ€§æ¥éšè—æ˜¾ç¤ºåœ¨ä»»åŠ¡æ ä¸Šçš„çª—å£ç¨‹åºæŒ‰é’®
 	hwnd = CreateWindowEx(WS_EX_TOOLWINDOW,
 		szAppName, szWndName,
 		WS_POPUP,
@@ -498,7 +498,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	NOTIFYICONDATA nid = { NULL };
 	UINT WM_TASKBARCREATED;
 
-	// ²»ÒªĞŞ¸ÄTaskbarCreated£¬ÕâÊÇÏµÍ³ÈÎÎñÀ¸×Ô¶¨ÒåµÄÏûÏ¢
+	// ä¸è¦ä¿®æ”¹TaskbarCreatedï¼Œè¿™æ˜¯ç³»ç»Ÿä»»åŠ¡æ è‡ªå®šä¹‰çš„æ¶ˆæ¯
 	WM_TASKBARCREATED = RegisterWindowMessage(TEXT("TaskbarCreated"));
 	switch (message)
 	{
@@ -513,14 +513,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		lstrcpy(nid.szTip, szAppName);
 
 		hMenu = CreatePopupMenu();
-		AppendMenuA(hMenu, auto_Pause ? MF_CHECKED : MF_UNCHECKED, ID_AUTO, "×Ô¶¯ÔİÍ£");
-		AppendMenuA(hMenu, hPause ? MF_CHECKED : MF_UNCHECKED, ID_HPAUSE, "Ç¿ÖÆÔİÍ£");
-		AppendMenuA(hMenu, paused ? MF_CHECKED : MF_UNCHECKED, ID_PAUSED, "ÒÑÔİÍ£");
-		AppendMenuA(hMenu, MF_SEPARATOR, NULL, NULL); //Ë®Æ½Ïß
+		AppendMenuA(hMenu, auto_Pause ? MF_CHECKED : MF_UNCHECKED, ID_AUTO, "è‡ªåŠ¨æš‚åœ");
+		AppendMenuA(hMenu, hPause ? MF_CHECKED : MF_UNCHECKED, ID_HPAUSE, "å¼ºåˆ¶æš‚åœ");
+		AppendMenuA(hMenu, paused ? MF_CHECKED : MF_UNCHECKED, ID_PAUSED, "å·²æš‚åœ");
+		AppendMenuA(hMenu, MF_SEPARATOR, NULL, NULL); //æ°´å¹³çº¿
 		AppendMenuA(hMenu, MF_STRING, ID_SEARCH, now_Window->Get_Window_HWND() == 0 ? no_Window_Text : have_Window_Text);
-		AppendMenuA(hMenu, MF_STRING, ID_CHANGE, "ÇĞ»»ÔİÍ£");
-		AppendMenuA(hMenu, MF_STRING, ID_CLOSE, "¹Ø±Õ±ÚÖ½");
-		AppendMenuA(hMenu, MF_STRING, ID_EXIT, "ÍË³ö");
+		AppendMenuA(hMenu, MF_STRING, ID_CHANGE, "åˆ‡æ¢æš‚åœ");
+		AppendMenuA(hMenu, MF_STRING, ID_CLOSE, "å…³é—­å£çº¸");
+		AppendMenuA(hMenu, MF_STRING, ID_EXIT, "é€€å‡º");
 
 		Shell_NotifyIcon(NIM_ADD, &nid);
 		break;
@@ -561,13 +561,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			case ID_SEARCH:
 			{
-				Get_Child_Window(now_Window); //¶ÁÈ¡È«²¿´°¿Ú
+				Get_Child_Window(now_Window); //è¯»å–å…¨éƒ¨çª—å£
 
-				//ÍË»Ø×îÇ°
+				//é€€å›æœ€å‰
 				while (now_Window->Get_Last_Window_ptr() != nullptr) now_Window = now_Window->Get_Last_Window_ptr();
 				if (now_Window->Get_Window_HWND() == 0 && now_Window->Get_Next_Window_ptr() != nullptr)
 				{
-					//É¾³ı0
+					//åˆ é™¤0
 					now_Window = now_Window->Get_Next_Window_ptr();
 					delete now_Window->Get_Last_Window_ptr();
 					now_Window->Set_Last_Window_ptr(nullptr);
@@ -608,11 +608,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	default:
 		/*
-		 * ·ÀÖ¹µ±Explorer.exe ±ÀÀ£ÒÔºó£¬³ÌĞòÔÚÏµÍ³ÏµÍ³ÍĞÅÌÖĞµÄÍ¼±ê¾ÍÏûÊ§
+		 * é˜²æ­¢å½“Explorer.exe å´©æºƒä»¥åï¼Œç¨‹åºåœ¨ç³»ç»Ÿç³»ç»Ÿæ‰˜ç›˜ä¸­çš„å›¾æ ‡å°±æ¶ˆå¤±
 		 *
-		 * Ô­Àí£ºExplorer.exe ÖØĞÂÔØÈëºó»áÖØ½¨ÏµÍ³ÈÎÎñÀ¸¡£µ±ÏµÍ³ÈÎÎñÀ¸½¨Á¢µÄÊ±ºò»áÏòÏµÍ³ÄÚËùÓĞ
-		 * ×¢²á½ÓÊÕTaskbarCreated ÏûÏ¢µÄ¶¥¼¶´°¿Ú·¢ËÍÒ»ÌõÏûÏ¢£¬ÎÒÃÇÖ»ĞèÒª²¶×½Õâ¸öÏûÏ¢£¬²¢ÖØ½¨Ïµ
-		 * Í³ÍĞÅÌµÄÍ¼±ê¼´¿É¡£
+		 * åŸç†ï¼šExplorer.exe é‡æ–°è½½å…¥åä¼šé‡å»ºç³»ç»Ÿä»»åŠ¡æ ã€‚å½“ç³»ç»Ÿä»»åŠ¡æ å»ºç«‹çš„æ—¶å€™ä¼šå‘ç³»ç»Ÿå†…æ‰€æœ‰
+		 * æ³¨å†Œæ¥æ”¶TaskbarCreated æ¶ˆæ¯çš„é¡¶çº§çª—å£å‘é€ä¸€æ¡æ¶ˆæ¯ï¼Œæˆ‘ä»¬åªéœ€è¦æ•æ‰è¿™ä¸ªæ¶ˆæ¯ï¼Œå¹¶é‡å»ºç³»
+		 * ç»Ÿæ‰˜ç›˜çš„å›¾æ ‡å³å¯ã€‚
 		 */
 		if (message == WM_TASKBARCREATED)
 			SendMessage(hwnd, WM_CREATE, wParam, lParam);
@@ -631,10 +631,10 @@ bool string_Compere(const char STR1[], const char STR2[])
 
 	while (STR1[i] != '\0' && STR2[j] != '\0')
 	{
-		if (STR1[i] != STR2[j]) return false; //±È½Ï
+		if (STR1[i] != STR2[j]) return false; //æ¯”è¾ƒ
 		i++;
 		j++;
-		while (STR1[i] == ' ' || STR1[i] == '\n') i++;//ÅÅ³ı¿Õ¸ñ
+		while (STR1[i] == ' ' || STR1[i] == '\n') i++;//æ’é™¤ç©ºæ ¼
 		while (STR2[j] == ' ' || STR2[j] == '\n') j++;
 	}
 
@@ -697,28 +697,28 @@ void loop()
 		
 		if (text_In(buffer, black_List, black_List_Number))
 		{
-			//ºÚÃûµ¥
+			//é»‘åå•
 			mul = target_Screen_Pixels;
 		}
 		else if (text_In(buffer, white_List, white_List_Number))
 		{
-			//°×Ãûµ¥
+			//ç™½åå•
 			mul = 0;
 		}
 		else
 		{
-			//Ê£ÏÂµÄ
+			//å‰©ä¸‹çš„
 			GetWindowRect(active_HWND, &active_Rect);
 			mul = (active_Rect.right - active_Rect.left) * (active_Rect.bottom - active_Rect.top);
 		}
 
 		target_State = mul >= target_Screen_Pixels;
 
-		if (target_State != paused) continues++; //Òª±ä
-		else continues = 0; //ÏàÍ¬ÖÃÁã
+		if (target_State != paused) continues++; //è¦å˜
+		else continues = 0; //ç›¸åŒç½®é›¶
 
 		if (continues > continue_Time[target_State])
-			pause_All_Window(); //´ïµ½Ô¤¼ÆÊ±¼ä
+			pause_All_Window(); //è¾¾åˆ°é¢„è®¡æ—¶é—´
 		//else
 		//	std::cout << "now " << (paused ? "paused" : "play") << endl;
 	}
