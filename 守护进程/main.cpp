@@ -17,6 +17,7 @@
 * 0.0.0.3 添加白名单和黑名单 （遗忘添加版本号） 2023/1/14
 * 0.0.0.4 修复隐藏控制台后不恢复的bug 2023/1/14
 * 0.0.0.5 修复保存白名单时错误的问题 修复读取错误数值后死循环的bug 2023/2/1
+* 0.0.0.6 更正窗口标题 添加shouconsole参数 字符串匹配将不匹配大小写 2023/2/2
 * 
 * next
 */
@@ -29,19 +30,19 @@ struct Window_And_HWND
 	HWND Window_HWND;
 };
 
-constexpr char Progream_Version[] = "0.0.0.5";
+constexpr char Progream_Version[] = "0.0.0.6";
 constexpr unsigned File_Version = 1;
 constexpr char List_Path[] = ".\\桌面之下\\list.txt";
 constexpr unsigned int update_Time = 1;
 constexpr unsigned int continue_Time[2] = { 2,5 }; //恢复和暂停
 constexpr char endl = '\n';
 constexpr bool Ignore_Other_Window = true;
-#ifdef _DEBUG
-constexpr bool Show_Console = true;
-#else
-constexpr bool Show_Console = false;
-#endif
 constexpr float Target_Screen_Rate = 0.81f;
+#ifdef _DEBUG
+bool Defalut_Show_Console = true;
+#else
+bool Defalut_Show_Console = false;
+#endif
 
 //sf::RenderWindow window;
 //sf::Font font;
@@ -49,6 +50,7 @@ constexpr float Target_Screen_Rate = 0.81f;
 Window_Infomation* now_Window = nullptr;
 time_t next_Time = 0;
 HWND Console_HWND = 0;
+bool Show_Console = Defalut_Show_Console;
 char null_List_char[] = "null";
 char** black_List = nullptr;
 char** white_List = nullptr;
@@ -99,13 +101,13 @@ void Initialize()
 	std::cout << "32位版本" << endl;
 #endif // _WIN64
 
-	Console_HWND = FindWindow(L"ConsoleWindowClass", NULL);//获取句柄
-	if (Console_HWND != NULL && !Show_Console) ShowWindow(Console_HWND, SW_HIDE);//隐藏窗口
-	Window_Infomation::Set_Self_Window_Exist(false);
-
 	int desktop_Size[2] = { 0,0 };
 	Window_Infomation::Get_Desktop_Size(desktop_Size[0], desktop_Size[1]);
 	target_Screen_Pixels = (unsigned int)(desktop_Size[0] * desktop_Size[1] * Target_Screen_Rate);
+
+	Load_List(List_Path);//读取配置文件
+	Console_HWND = FindWindow(L"ConsoleWindowClass", NULL);//获取句柄
+	if (Console_HWND != NULL && !Show_Console) ShowWindow(Console_HWND, SW_HIDE);//隐藏窗口
 
 	Window_Infomation::Set_Self_Window_Exist(false);//不存在窗口
 	now_Window = new Window_Infomation;
@@ -120,8 +122,6 @@ void Initialize()
 		delete now_Window->Get_Last_Window_ptr();
 		now_Window->Set_Last_Window_ptr(nullptr);
 	}
-
-	Load_List(List_Path);
 }
 
 void Enetialize()
@@ -155,6 +155,7 @@ void Save_List(const char Path[])
 		file << "whiteList=" << white_List[i] << ';' << endl;
 	for (unsigned i = 0; i < black_List_Number; i++)
 		file << "blackList=" << black_List[i] << ';' << endl;
+	if (Show_Console) file << "showConsole=true;" << endl;
 	file << "end" << endl;
 }
 
@@ -243,6 +244,17 @@ void Load_List(const char Path[])
 			now_black++;
 		}
 
+		else if (string_Compere(buffer, "showConsole"))
+		{
+			file.getline(buffer, sizeof(buffer), ';');
+
+			if (atoi(buffer) != 0) Show_Console = true; //非零数字改为true，其他数据不更改
+			if (string_Compere(buffer,"0")) Show_Console = false; //"0"改为false
+			if (string_Compere(buffer, "true")) Show_Console = true;
+			if (string_Compere(buffer, "false")) Show_Console = false;
+			std::clog << "显示控制台:" << (Show_Console ? "是" : "否") << endl;
+		}
+
 		else if (string_Compere(buffer, "end"))
 		{
 			break;
@@ -250,6 +262,8 @@ void Load_List(const char Path[])
 
 		else //未知数据
 		{
+			std::clog << "未知数据:" << buffer << endl;
+
 			//文件结束
 			if (file.eof())
 				break;
@@ -261,6 +275,12 @@ void Load_List(const char Path[])
 	}
 
 	file.close();
+
+	std::clog << "白名单数量:" << white_List_Number << endl;
+	for (unsigned i = 0; i < white_List_Number; i++) std::clog << i + 1 << ':' << white_List[i] << endl;
+	std::clog << "黑名单数量:" << black_List_Number << endl;
+	for (unsigned i = 0; i < black_List_Number; i++) std::clog << i + 1 << ':' << black_List[i] << endl;
+
 	return;
 }
 
@@ -419,7 +439,7 @@ BOOL CALLBACK Enum_Child_Widow(HWND Window_HWND, LPARAM lparam)
 }
 
 LPCTSTR szAppName = TEXT("守护进程");
-LPCTSTR szWndName = TEXT("where is it?");
+LPCTSTR szWndName = TEXT("守护进程");
 HMENU hMenu = nullptr;
 HINSTANCE hInstance = 0;
 constexpr char no_Window_Text[] = "未找到窗口";
@@ -631,7 +651,7 @@ bool string_Compere(const char STR1[], const char STR2[])
 
 	while (STR1[i] != '\0' && STR2[j] != '\0')
 	{
-		if (STR1[i] != STR2[j]) return false; //比较
+		if (STR1[i] != STR2[j] && (STR1[i] - STR2[j] != 32) && (STR2[i] - STR1[j] != 32)) return false; //不相等 且 不是大小写
 		i++;
 		j++;
 		while (STR1[i] == ' ' || STR1[i] == '\n') i++;//排除空格
