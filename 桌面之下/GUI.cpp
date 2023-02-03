@@ -12,8 +12,10 @@ char Font_Name[Font_Name_Lenght] = "msyh.ttc";//字体名称
 sf::Image Progream_Icon;//图标
 //HWND Self_HWND;//自己的句柄
 HWND Console_HWND;//控制台的句柄
+HWND Keep_HWND;//守护进程的句柄 1.0.4.0
 char FFplay_Path[FFplay_Path_Lenght] = "";//ffplay路径
 char FFmpeg_Path[FFplay_Path_Lenght] = "";//ffmpeg路径
+char Keep_Path[Keep_Path_Lenght] = "";//守护进程路径
 char Setting_Floor_Path[Setting_File_Lenght] = ".\\桌面之下\\";//设置文件夹的路径
 char Setting_File_Name[Setting_File_Lenght] = "setting.txt";//设置文件的名称
 
@@ -342,11 +344,26 @@ void Print()
 			}
 			Text[3].setString(Buffer);
 		}
-	
-		if (Now_Window->Is_Top_Most())
-			Text[9].setString(L"取消窗口置顶");
+		if (Now_Window->Is_ffplay_Window())
+		{
+			//1.0.4.0
+			if (Keep_HWND == 0)
+			{
+				//没有
+				Text[9].setString(L"启动守护进程");
+			}
+			else
+			{
+				Text[9].setString(L"已存在守护进程");
+			}
+		}
 		else
-			Text[9].setString(L"设置窗口置顶");
+		{
+			if (Now_Window->Is_Top_Most())
+				Text[9].setString(L"取消窗口置顶");
+			else
+				Text[9].setString(L"设置窗口置顶");
+		}
 
 		if (Changing_Position)
 			Text[10].setString(L"更改位置");
@@ -690,7 +707,7 @@ void Event(bool Flag)
 				}
 				case 4:
 				{
-					//选择窗口和窗口置顶
+					//选择窗口和窗口置顶、启动守护进程
 					Input_Position = ENUM::Input_Position::INP_NULL;//输入模式归位
 					if (Event.mouseButton.x < Window.getSize().x * 0.33)
 					{
@@ -700,8 +717,17 @@ void Event(bool Flag)
 					{
 						//Set_Focus();//这是好之前的版本了
 						//Set_Most_Window(Now_Window->Get_Window_HWND()); 1.0.2.5删除
-						Now_Window->Set_Top_Most(!Now_Window->Is_Top_Most());
-						Update_Draw = true;
+						if (Now_Window->Is_ffplay_Window())
+						{
+							//1.0.4.0 启动守护进程
+							Keep_Massage(0);
+							Update_Draw = true;
+						}
+						else
+						{
+							Now_Window->Set_Top_Most(!Now_Window->Is_Top_Most());
+							Update_Draw = true;
+						}
 					}
 					break;
 				}
@@ -728,6 +754,7 @@ void Event(bool Flag)
 						{
 							//1.0.3.19
 							Now_Window->Send_Message(VK_ESCAPE,0x00010001);
+							//Now_Window->Update_Window_HWND(); //时间太短，更新没有用
 							Update_Draw = true; //窗口不存在，需要重新渲染
 						}
 						else

@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include "Operator.h"
 #include "Window_Infomation_Class.h"
+#include "massage.h"
 
 /*
 * 在这里共用变量和函数
@@ -52,14 +53,15 @@
 * 1.0.3.17 修复识别ffplay需要点一下非壁纸窗口的bug(update_Infomation中自动调用Update_Is_ffplay_Window)
 * 1.0.3.18 尝试修复有时ffplay窗口在任务栏显示的bug 配合守护线程完善自我窗口存在的标记 配合守护线程加入获取桌面大小的函数 启动将在控制台输出版本消息 2023/1/12
 * 1.0.3.19 修改Pause为SandMessage 当窗口是ffplay时替换恢复窗口为关闭窗口 修改窗口时不再强制恢复桌面之上了 修复最后一项搜索PM子窗口的时候不更新的bug 修复搜索PM子窗口在0后新建的bug 2023/1/13
+* 1.0.4.0(1.0.3.20) 使用键值对的方式存储数据 修改文件版本号为8 发现关闭窗口后不更新的bug 当窗口是ffplay时替换置顶窗口为启动守护进程 播放视频后若存在守护进程则发送消息（ME_SEARCH）给守护进程 2022/2/3
 * 
-* Next 更改窗口名称 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 重制设置文件格式 任务栏显示ffplay的bug dll拆分 守护线程合并
+* Next 更改窗口名称 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 任务栏显示ffplay的bug 关闭窗口后不更新的bug dll拆分 守护线程合并 自动适配msyh.ttf
 */
 
 #define	Message(STRING) MessageBox(NULL, STRING, L"桌面之下", MB_YESNO)
 
-constexpr unsigned File_Version = 7;
-constexpr char Progream_Version[] = "1.0.3.19";
+constexpr unsigned File_Version = 8;
+constexpr char Progream_Version[] = "1.0.4.0";
 //constexpr unsigned Progream_Version = 2;
 constexpr char endl = '\n';
 
@@ -86,6 +88,7 @@ namespace ENUM
 };
 
 constexpr unsigned Setting_File_Lenght = 100;
+constexpr unsigned Keep_Path_Lenght = 100;
 constexpr unsigned Video_Path_Lenght = 100;
 constexpr unsigned FFplay_Path_Lenght = 100;
 constexpr unsigned Recorder_Lenght = 100;
@@ -99,7 +102,9 @@ extern bool File_Exist;//是否存在文件
 extern bool Show_Console;//显示控制台
 extern char Setting_Floor_Path[Setting_File_Lenght];//设置文件夹的路径
 extern char Setting_File_Name[Setting_File_Lenght];//设置文件的名称
+extern char Keep_Path[Keep_Path_Lenght];//守护进程的路径
 extern HWND Console_HWND;//控制台的句柄
+extern HWND Keep_HWND;//守护进程的句柄 1.0.4.0
 //extern bool Keep_Undered;//保持桌面之下 1.0.2.5删除
 extern bool HEX_Mode;//十六进制输出
 //extern bool Self_Most_Top;//是否置顶
@@ -149,6 +154,7 @@ void Repair_W1_W2_Error(Window_Infomation* Window_Infomation_ptr = nullptr);//�
 void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[]);//播放视频
 void Creat_Vidoe_Texture(int Number);//创建图片
 //void Get_PM_Window_HWND(HWND& Return);//获取PM窗口句柄
+void Keep_Massage(Message_t ID);//发送消息给守护进程
 
 void Move_Window(Window_Infomation* Node, ENUM::Move_Type Flag);//移动窗口
 
@@ -160,6 +166,7 @@ void Choise_Window();//选择窗口
 //void Under_or_Up(Window_Infomation Node);//设置或恢复 1.0.2.5删除
 //void Keep_Under();//保持在桌面之下 1.0.2.5删除
 
+bool string_Compere(const char STR1[], const char STR2[]);
 void CharToTchar(const char* _char, TCHAR* tchar, UINT CodePage = CP_ACP);//https://blog.csdn.net/imxiangzi/article/details/39483041 转换char和tchar
 void TcharToChar(const TCHAR* tchar, char* _char, UINT CodePage = CP_ACP);//https://blog.csdn.net/imxiangzi/article/details/39483041 转换char和tchar
 void Spict_Name(const char Source[], char Name[], const int Name_Lenght);//分解路径

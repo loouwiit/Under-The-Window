@@ -1,12 +1,12 @@
-7
-D:\File\Program\ffmpeg\ffplay.exe
-D:\File\Program\ffmpeg\ffmpeg.exe
-
-D:\File\特殊\动态壁纸\video\1.mp4
-
-
-3
-3416148 0 0 0 1920 1080 
-1509108 0 0 0 0 0 
-1509108 0 0 0 0 0 
-Show_Console
+version=8;
+ffplayPath=D:\File\Program\ffmpeg\ffplay.exe;
+ffmpegPath=D:\File\Program\ffmpeg\ffmpeg.exe;
+keepPath=..\守护进程\守护进程.exe;
+video1Path=D:\File\特殊\动态壁纸\video\1.mp4;
+video2Path=D:\File\特殊\动态壁纸\video\15.mp4;
+video3Path=D:\File\特殊\动态壁纸\video\17.mp4;
+video4Path=D:\File\特殊\动态壁纸\video\18.mp4;
+window=0000000000B402AC 0000000000000000 0 0 0 0;
+window=0000000001260AC8 0000000000000000 0 0 780 438;
+showConsole=true;
+end

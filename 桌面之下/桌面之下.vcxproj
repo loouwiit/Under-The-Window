@@ -155,6 +155,7 @@
     <ClCompile Include="Window_Infomation_Class.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\守护进程\massage.h" />
     <ClInclude Include="Operator.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
@@ -166,6 +167,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="桌面之下.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="桌面之下\setting.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

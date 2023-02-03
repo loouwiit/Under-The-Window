@@ -452,37 +452,92 @@ Window_Infomation* Window_Infomation::Get_Last_Window_ptr()
 	return this->Last_Window_ptr;
 }
 
-/// <summary>
-/// 获取对象——句柄、父句柄、是否在桌面之下、是否是顶层窗口、XY、长宽
-/// </summary>
-/// <param name="Stream">输入的流对象</param>
-/// <returns></returns>
-std::istream& Window_Infomation::operator<<(std::istream& Stream)
-{
-	long long Input = 0;
-	Stream >> Input;
-	this->Window_HWND = (HWND)Input;
-	Stream >> Input;
-	this->Window_Parent_HWND = (HWND)Input;
-	Stream >> this->Window_Oreginal_RECT.top >> this->Window_Oreginal_RECT.left
-		>> this->Window_Oreginal_RECT.right >> this->Window_Oreginal_RECT.bottom;
+///// <summary>
+///// 获取对象——句柄、父句柄、是否在桌面之下、是否是顶层窗口、XY、长宽
+///// </summary>
+///// <param name="Stream">输入的流对象</param>
+///// <returns></returns>
+//std::istream& Window_Infomation::operator<<(std::istream& Stream)
+//{
+//	long long Input = 0;
+//	Stream >> Input;
+//	this->Window_HWND = (HWND)Input;
+//	Stream >> Input;
+//	this->Window_Parent_HWND = (HWND)Input;
+//	Stream >> this->Window_Oreginal_RECT.top >> this->Window_Oreginal_RECT.left
+//		>> this->Window_Oreginal_RECT.right >> this->Window_Oreginal_RECT.bottom;
+//
+//	this->Update_Window_HWND();
+//	return Stream;
+//}
+//
+///// <summary>
+///// 输出对象——句柄、父句柄、是否在桌面之下、是否是顶层窗口、XY、长宽
+///// </summary>
+///// <param name="Stream">输出的流对象</param>
+///// <returns></returns>
+//std::ostream& Window_Infomation::operator>>(std::ostream& Stream)
+//{
+//	Stream << (long long)(this->Window_HWND) << ' '
+//		<< (long long)(this->Window_Parent_HWND) << ' '
+//		<< this->Window_Oreginal_RECT.top << ' ' << this->Window_Oreginal_RECT.left << ' '
+//		<< this->Window_Oreginal_RECT.right << ' ' << this->Window_Oreginal_RECT.bottom << ' ';
+//	return Stream;
+//}
 
-	this->Update_Window_HWND();
-	return Stream;
+char* Window_Infomation::Get_To_Char(char* string, size_t length)
+{
+	constexpr size_t min_Size = sizeof("FFFFFFFFFFFFFFFF FFFFFFFFFFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF") / sizeof(char);
+	if (string == nullptr || length < min_Size)
+	{
+		string = new char[min_Size];
+		length = min_Size;
+	}
+
+	sprintf_s(string, length, "%p %p %X %X %X %X",
+		this->Window_HWND, this->Window_Parent_HWND,
+		(unsigned long)this->Window_Oreginal_RECT.top, (unsigned long)this->Window_Oreginal_RECT.left,
+		(unsigned long)this->Window_Oreginal_RECT.right, (unsigned long)this->Window_Oreginal_RECT.bottom);
+
+	return string;
 }
 
-/// <summary>
-/// 输出对象——句柄、父句柄、是否在桌面之下、是否是顶层窗口、XY、长宽
-/// </summary>
-/// <param name="Stream">输出的流对象</param>
-/// <returns></returns>
-std::ostream& Window_Infomation::operator>>(std::ostream& Stream)
+void Window_Infomation::Set_From_Char(const char* string)
 {
-	Stream << (long long)(this->Window_HWND) << ' '
-		<< (long long)(this->Window_Parent_HWND) << ' '
-		<< this->Window_Oreginal_RECT.top << ' ' << this->Window_Oreginal_RECT.left << ' '
-		<< this->Window_Oreginal_RECT.right << ' ' << this->Window_Oreginal_RECT.bottom << ' ';
-	return Stream;
+	char space_Number = 0;
+	for (unsigned i = 0; string[i] != '\0'; i++)
+	{
+		if (string[i] == ' ') space_Number++;
+	}
+	if (space_Number != 5) return; //数目不够
+
+	//分离string到out_String
+	size_t string_Length = strlen(string) + 1;
+	char* char_String = new char[string_Length];
+	strcpy_s(char_String, string_Length, string);
+	char* out_String[6] = { nullptr };
+	unsigned index = 0;
+	out_String[0] = char_String;
+	for (unsigned i = 0; char_String[i] != '\0'; i++)
+	{
+		if (char_String[i] == ' ')
+		{
+			char_String[i] = '\0';
+			index++;
+			out_String[index] = &char_String[i + 1];
+		}
+	}
+
+	this->Window_HWND = (HWND)strtoull(out_String[0], nullptr, 16);//16进制，转换后的字符放到nullptr中（抛弃）
+	this->Window_Parent_HWND = (HWND)strtoull(out_String[1], nullptr, 16);
+	this->Window_Oreginal_RECT.top = strtoul(out_String[2], nullptr, 16);
+	this->Window_Oreginal_RECT.left = strtoul(out_String[3], nullptr, 16);
+	this->Window_Oreginal_RECT.right = strtoul(out_String[4], nullptr, 16);
+	this->Window_Oreginal_RECT.bottom = strtoul(out_String[5], nullptr, 16);
+
+	delete[] char_String;
+	for (unsigned i = 0; i < 6; i++)
+		out_String[i] = nullptr;
 }
 
 /// <summary>

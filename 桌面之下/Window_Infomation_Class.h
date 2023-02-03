@@ -44,8 +44,11 @@ public:
 	Window_Infomation* Get_Next_Window_ptr();
 	Window_Infomation* Get_Last_Window_ptr();
 
-	std::istream& operator<<(std::istream& Stream);//在对象里写重载不用写第二个参数
-	std::ostream& operator>>(std::ostream& Stream);
+	//std::istream& operator<<(std::istream& Stream);//在对象里写重载不用写第二个参数
+	//std::ostream& operator>>(std::ostream& Stream);
+
+	char* Get_To_Char(char* string = nullptr, size_t length = 0);
+	void Set_From_Char(const char* string = nullptr);
 
 	static bool Is_Self_Top_Most();
 	static void Set_Self_Top_Most(bool Flag);

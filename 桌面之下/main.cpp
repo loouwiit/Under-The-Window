@@ -69,12 +69,13 @@ void Set_File_Setting(const char Setting_File_Path[])
 		}
 	}
 	//开始写入
-	File << File_Version << endl;//版本
-	File << FFplay_Path << endl;//FFplay路径
-	File << FFmpeg_Path << endl;//FFmpeg路径
+	File << "version=" << File_Version << ';' << endl;//版本
+	File << "ffplayPath=" << FFplay_Path << ';' << endl;//FFplay路径
+	File << "ffmpegPath=" << FFmpeg_Path << ';' << endl;//FFmpeg路径
+	File << "keepPath=" << Keep_Path << ';' << endl;//守护进程路径
 
 	for (int i = 0; i < 4; i++)
-		File << Quick_Video_Path[i] << endl;//写入快速播放
+		File << "video" << i + 1 << "Path=" << Quick_Video_Path[i] << ';' << endl;//写入快速播放
 
 	//保留桌面之下 1.0.2.5后永久保持
 	//if (Keep_Undered)
@@ -88,36 +89,48 @@ void Set_File_Setting(const char Setting_File_Path[])
 	//}
 
 	//写入窗口信息
-	File << Window_Infomation::Get_Window_Number() << endl;//数量
+	//File << Window_Infomation::Get_Window_Number() << endl;//数量
 	Window_Infomation* Out_Window = Now_Window;
 	//回到最前
 	while (Out_Window->Get_Last_Window_ptr() != nullptr)
 	{
 		Out_Window = Out_Window->Get_Last_Window_ptr();
 	}
-	//写到最后
-	while (Out_Window->Get_Next_Window_ptr() != nullptr)
+	////写到最后 //1.0.3.20
+	//while (Out_Window->Get_Next_Window_ptr() != nullptr)
+	//{
+	//	*Out_Window >> File;
+	//	File << endl;
+	//	Out_Window = Out_Window->Get_Next_Window_ptr();
+	//}
+	////最后一个
+	//{
+	//	*Out_Window >> File;
+	//	File << endl;
+	//}
+
+	char* out_String = nullptr;
+	while (Out_Window != nullptr)
 	{
-		*Out_Window >> File;
-		File << endl;
+		out_String = Out_Window->Get_To_Char();
+		File << "window=" << out_String << ';' << endl;
+		delete[] out_String;
+		out_String = nullptr;
 		Out_Window = Out_Window->Get_Next_Window_ptr();
 	}
-	//最后一个
-	{
-		*Out_Window >> File;
-		File << endl;
-	}
 
-	if (Show_Console) File << "Show_Console" << endl;//显示控制台
-	if (strcmp(Font_Name, "msyh.ttc") != 0) File << "Font_Name" << endl << Font_Name << endl;//写入字体名称
+	if (Show_Console) File << "showConsole=true;" << endl;//显示控制台
+	if (strcmp(Font_Name, "msyh.ttc") != 0) File << "fontName=" << Font_Name << ';' << endl;//写入字体名称
 	for (int Number = 0; Number < 4; Number++)
-		if (Quick_Video_Decoder[Number][0] != '\0') File << "Video_" << Number + 1 << "_Decoder" << endl << Quick_Video_Decoder[Number] << endl;//写入解码器
+		if (Quick_Video_Decoder[Number][0] != '\0') File << "video" << Number + 1 << "Decoder=" << Quick_Video_Decoder[Number] << ';' << endl;//写入解码器
+	File << "end" << endl;
+	File.close();
 }
 
 void Get_File_Setting(const char Setting_File_Path[], const bool Disabled_Warning)
 {
 	std::ifstream File;
-	int Input_File_Version;
+	//int Input_File_Version;
 	char Input[100] = "";
 	File.open(Setting_File_Path);
 	if (!File.is_open())
@@ -130,15 +143,63 @@ void Get_File_Setting(const char Setting_File_Path[], const bool Disabled_Warnin
 	//存在setting.txt
 	File_Exist = true;
 
+	////版本 //1.0.3.20删除
+	//File >> Input;
+	//Input_File_Version = atoi(Input);
+	//if (Input_File_Version != File_Version)
+	//{
+	//	//文件版本错误
+	//	if (!Disabled_Warning)
+	//	{
+	//		if (Message(L"文件版本错误\n是否重写写入?") == IDYES)
+	//		{
+	//			Set_File_Setting(Setting_File_Path);
+	//		}
+	//		else
+	//		{
+	//			File_Exist = false;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		//Disabled
+	//		std::cout << "文件版本错误" << endl;
+	//		File_Exist = false;
+	//	}
+	//	return;
+	//}//文件版本错误
+	//File.ignore();
+
 	//版本
-	File >> Input;
-	Input_File_Version = atoi(Input);
-	if (Input_File_Version != File_Version)
+	File.getline(Input, sizeof(Input), '=');
+	if (string_Compere(Input, "version"))
 	{
-		//文件版本错误
+		File.getline(Input, ';');
+		if (atoi(Input) != File_Version)
+		{
+			//文件版本错误
+			File.close();
+			if (!Disabled_Warning)
+			{
+				if (Message(L"文件版本错误\n是否重写写入?") == IDYES)
+				{
+					Set_File_Setting(Setting_File_Path);
+				}
+				else
+				{
+					File_Exist = false;
+				}
+			}
+			return;
+		}
+	}
+	else
+	{
+		//文件异常
+		File.close();
 		if (!Disabled_Warning)
 		{
-			if (Message(L"文件版本错误\n是否重写写入?") == IDYES)
+			if (Message(L"文件错误\n是否重写写入?") == IDYES)
 			{
 				Set_File_Setting(Setting_File_Path);
 			}
@@ -147,82 +208,76 @@ void Get_File_Setting(const char Setting_File_Path[], const bool Disabled_Warnin
 				File_Exist = false;
 			}
 		}
-		else
-		{
-			//Disabled
-			std::cout << "文件版本错误" << endl;
-			File_Exist = false;
-		}
 		return;
-	}//文件版本错误
-	File.ignore();
+	}
 
-	//ffplay
-	File.getline(FFplay_Path, 100);
-	File.getline(FFmpeg_Path, 100);
-
-	//快速播放
-	for (int i = 0; i < 4; i++)
-		File.getline(Quick_Video_Path[i], Video_Path_Lenght);
-
-	////保留桌面之下
+	////ffplay //1.0.3.20删除
+	//File.getline(FFplay_Path, 100);
+	//File.getline(FFmpeg_Path, 100);
+	//
+	////快速播放
+	//for (int i = 0; i < 4; i++)
+	//	File.getline(Quick_Video_Path[i], Video_Path_Lenght);
+	//
+	//////保留桌面之下
+	////File >> Input;
+	////Now_Window->Get_Window_HWND() = (HWND)atoll(Input);
+	////if (Now_Window->Get_Window_HWND() != NULL)//存在保留
+	////{
+	////	File >> Under_Window_Info.left >> Under_Window_Info.top >> Under_Window_Info.right >> Under_Window_Info.bottom;
+	////	File >> Input;
+	////	Parent_HWND = (HWND)atoll(Input);//父窗口
+	////	Keep_Undered = true;
+	////	std::cout << PM_Window_HWND;
+	////	Undered = GetAncestor(Now_Window->Get_Window_HWND(), GA_ROOT) == PM_Window_HWND ? true : false;//在PM窗口之下：桌面之下
+	////}
+	//
+	////获取窗口信息
 	//File >> Input;
-	//Now_Window->Get_Window_HWND() = (HWND)atoll(Input);
-	//if (Now_Window->Get_Window_HWND() != NULL)//存在保留
+	//int Number = (int)atoll(Input);
+	//Window_Infomation* Tmp_Window = nullptr;
+	//
+	//while (Now_Window->Get_Window_HWND() == NULL && Number > 0)
 	//{
-	//	File >> Under_Window_Info.left >> Under_Window_Info.top >> Under_Window_Info.right >> Under_Window_Info.bottom;
-	//	File >> Input;
-	//	Parent_HWND = (HWND)atoll(Input);//父窗口
-	//	Keep_Undered = true;
-	//	std::cout << PM_Window_HWND;
-	//	Undered = GetAncestor(Now_Window->Get_Window_HWND(), GA_ROOT) == PM_Window_HWND ? true : false;//在PM窗口之下：桌面之下
+	//	*Now_Window << File;
+	//	//Now_Window->Is_ffplay_Window();
+	//	if (!IsWindow(Now_Window->Get_Window_HWND()))
+	//	{
+	//		Number--;
+	//		Now_Window->Set_Window_HWND(NULL);
+	//	}
 	//}
+	//for (int i = 1; i < Number; i++)
+	//{
+	//	if (Tmp_Window == nullptr) Tmp_Window = new Window_Infomation;
+	//	*Tmp_Window << File;
+	//	if (IsWindow(Tmp_Window->Get_Window_HWND()))
+	//	{
+	//		Tmp_Window->Set_Last_Window_ptr(Now_Window);
+	//		Now_Window->Set_Next_Window_ptr(Tmp_Window);
+	//		Now_Window = Tmp_Window;
+	//		Tmp_Window = nullptr;
+	//		//Now_Window->Is_ffplay_Window();
+	//	}
+	//}
+	//if (Tmp_Window != nullptr)
+	//{
+	//	//删除最后一个多余的窗口
+	//	delete Tmp_Window;
+	//	Tmp_Window = nullptr;
+	//}
+	//
+	////倒回第一个
+	//while (Now_Window->Get_Last_Window_ptr() != NULL)
+	//{
+	//	Now_Window = Now_Window->Get_Last_Window_ptr();
+	//}
+	//
+	//File.ignore();//忽略换行
 
-	//获取窗口信息
-	File >> Input;
-	int Number = (int)atoll(Input);
-	Window_Infomation* Tmp_Window = nullptr;
-
-	while (Now_Window->Get_Window_HWND() == NULL && Number > 0)
-	{
-		*Now_Window << File;
-		//Now_Window->Is_ffplay_Window();
-		if (!IsWindow(Now_Window->Get_Window_HWND()))
-		{
-			Number--;
-			Now_Window->Set_Window_HWND(NULL);
-		}
-	}
-	for (int i = 1; i < Number; i++)
-	{
-		if (Tmp_Window == nullptr) Tmp_Window = new Window_Infomation;
-		*Tmp_Window << File;
-		if (IsWindow(Tmp_Window->Get_Window_HWND()))
-		{
-			Tmp_Window->Set_Last_Window_ptr(Now_Window);
-			Now_Window->Set_Next_Window_ptr(Tmp_Window);
-			Now_Window = Tmp_Window;
-			Tmp_Window = nullptr;
-			//Now_Window->Is_ffplay_Window();
-		}
-	}
-	if (Tmp_Window != nullptr)
-	{
-		//删除最后一个多余的窗口
-		delete Tmp_Window;
-		Tmp_Window = nullptr;
-	}
-
-	//倒回第一个
-	while (Now_Window->Get_Last_Window_ptr() != NULL)
-	{
-		Now_Window = Now_Window->Get_Last_Window_ptr();
-	}
-
-	File.ignore();//忽略换行
-
-	//其他设置
+	//其他设置 1.0.3.20后为其他所有非固定位置的数据
 	Get_Other_Setting(File, Disabled_Warning);
+	File.close();
 }
 
 /* 1.0.2.5 删除
@@ -470,7 +525,7 @@ void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[])
 
 	if (Show_Console) std::cout << "播放视频，调用信息:" << Param << endl;//给出参数
 
-	if (CreateProcessA(FFplay_Path, Param, 0, 0, 0, CREATE_NEW_CONSOLE | IDLE_PRIORITY_CLASS, 0, 0, &si, &pi))//新控制台，低优先级 //C6335 句柄泄露
+	if (CreateProcessA(FFplay_Path, Param, 0, 0, 0, CREATE_NEW_CONSOLE | IDLE_PRIORITY_CLASS, 0, 0, &si, &pi))//新控制台，低优先级
 	{
 		CloseHandle(pi.hProcess);//关闭句柄 https://learn.microsoft.com/zh-cn/cpp/code-quality/c6335?view=msvc-170
 		CloseHandle(pi.hThread);
@@ -521,6 +576,10 @@ void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[])
 				ffplay_Thread = new std::thread(ffplay_Pause_Thread, std::ref(ffplay_Windows));
 			}
 			*/
+			
+			//1.0.4.0 让守护进程搜索
+			Keep_Massage(ME_SEARCH);
+
 			Update_Draw = true;
 		}
 		else
@@ -531,6 +590,40 @@ void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[])
 	else
 	{
 		Message(L"播放失败");
+	}
+}
+
+void Keep_Massage(Message_t ID)
+{
+	if (!IsWindow(Keep_HWND)) Keep_HWND = FindWindow(L"守护进程", L"守护进程");
+	switch (ID)
+	{
+	case 0:
+	{
+		if (Keep_HWND == 0)
+		{
+			//启动守护进程
+			constexpr int Param_Lengh = 1;
+			char Param[Param_Lengh] = "";
+			STARTUPINFOA si{ 0 };
+			PROCESS_INFORMATION pi{ 0 };
+			if (CreateProcessA(Keep_Path, Param, 0, 0, 0, CREATE_NEW_CONSOLE | IDLE_PRIORITY_CLASS, 0, 0, &si, &pi))//新控制台，低优先级
+			{
+				CloseHandle(pi.hProcess);//关闭句柄 https://learn.microsoft.com/zh-cn/cpp/code-quality/c6335?view=msvc-170
+				CloseHandle(pi.hThread);
+			}
+			else Message(L"启动失败");
+		}
+		break;
+	}
+	case ME_SEARCH:
+	{
+		if (Keep_HWND == NULL) break;
+
+		PostMessageA(Keep_HWND, ME_SEARCH, NULL, NULL);
+	}
+	default:
+		break;
 	}
 }
 
@@ -791,6 +884,44 @@ void Set_Focus()
 //	Update_Draw = true;//渲染
 //}
 
+bool string_Compere(const char STR1[], const char STR2[]) //1.0.3.20
+{
+	unsigned i = 0;
+	unsigned j = 0;
+
+	while (STR1[i] == ' ' || STR1[i] == '\n') i++;
+	while (STR2[j] == ' ' || STR2[j] == '\n') j++;
+
+	while (STR1[i] != '\0' && STR2[j] != '\0')
+	{
+		if (STR1[i] != STR2[j] && (STR1[i] - STR2[j] != 32) && (STR2[j] - STR1[i] != 32)) return false; //不相等 且 不是大小写
+		i++;
+		j++;
+		while (STR1[i] == ' ' || STR1[i] == '\n') i++;//排除空格
+		while (STR2[j] == ' ' || STR2[j] == '\n') j++;
+	}
+
+	if (STR1[i] == '\0')
+	{
+		while (STR2[j] != '\0')
+		{
+			if (STR2[j] == ' ' || STR2[j] == '\n') j++;
+			else return false;//后边仍有非空字符
+		}
+	}
+
+	if (STR2[j] == '\0')
+	{
+		while (STR1[i] != '\0')
+		{
+			if (STR1[i] == ' ' || STR1[i] == '\n') i++;
+			else return false;//后边仍有非空字符
+		}
+	}
+
+	return true;
+}
+
 void CharToTchar(const char* _char, TCHAR* tchar, UINT CodePage)
 {
 	int iLength;
@@ -812,40 +943,110 @@ void Get_Other_Setting(std::ifstream& File, const bool Disabled_Warning)
 {
 	char Input[100] = "";
 
-	while (File.peek() != EOF)
-	{
-		File.getline(Input, 100);
 
-		//debug显示控制台
-		if (strcmp(Input, "Show_Console") == 0 || strcmp(Input, "SC") == 0)
+	while (true)
+	{
+		File.getline(Input, sizeof(Input), '=');
+
+		if (string_Compere(Input, "window"))
 		{
-			Show_Console = true;
-			if (!Disabled_Warning) std::cout << "显示控制台" << endl;
+			File.getline(Input, sizeof(Input), ';');
+			if (IsWindow(Now_Window->Get_Window_HWND()))
+			{
+				//存在值，新建一个窗口
+				while (Now_Window->Get_Next_Window_ptr() != nullptr)
+					Now_Window = Now_Window->Get_Next_Window_ptr();//移到最后
+				Now_Window->Set_Next_Window_ptr(new Window_Infomation);
+				Now_Window->Get_Next_Window_ptr()->Set_Last_Window_ptr(Now_Window);
+				Now_Window = Now_Window->Get_Next_Window_ptr();
+			}
+			Now_Window->Set_From_Char(Input);
 		}
-		else if (strcmp(Input, "Font_Name") == 0 || strcmp(Input, "FN") == 0)
+		else if (string_Compere(Input, "ffplayPath") || string_Compere(Input, "FPP"))
 		{
-			File.getline(Font_Name, Font_Name_Lenght);
+			File.getline(FFplay_Path, sizeof(FFplay_Path), ';');
+			if (!Disabled_Warning) std::cout << "ffplay路径：" << FFplay_Path << endl;
+		}
+		else if (string_Compere(Input, "ffmpegPath") || string_Compere(Input, "FMP"))
+		{
+			File.getline(FFmpeg_Path, sizeof(FFmpeg_Path), ';');
+			if (!Disabled_Warning) std::cout << "ffmpeg路径：" << FFmpeg_Path << endl;
+		}
+		else if (string_Compere(Input, "keepPath") || string_Compere(Input, "KP"))
+		{
+			File.getline(Keep_Path, sizeof(Keep_Path), ';');
+			if (!Disabled_Warning) std::cout << "守护进程路径：" << Keep_Path << endl;
+		}
+		else if (string_Compere(Input, "video1Path") || string_Compere(Input, "V1P"))
+		{
+			File.getline(Quick_Video_Path[0], Video_Path_Lenght, ';');
+			if (!Disabled_Warning) std::cout << "视频一路径：" << Quick_Video_Path[0] << endl;
+		}
+		else if (string_Compere(Input, "video2Path") || string_Compere(Input, "V2P"))
+		{
+			File.getline(Quick_Video_Path[1], Video_Path_Lenght, ';');
+			if (!Disabled_Warning) std::cout << "视频二路径：" << Quick_Video_Path[1] << endl;
+		}
+		else if (string_Compere(Input, "video3Path") || string_Compere(Input, "V3P"))
+		{
+			File.getline(Quick_Video_Path[2], Video_Path_Lenght, ';');
+			if (!Disabled_Warning) std::cout << "视频三路径：" << Quick_Video_Path[2] << endl;
+		}
+		else if (string_Compere(Input, "video4Path") || string_Compere(Input, "V4P"))
+		{
+			File.getline(Quick_Video_Path[3], Video_Path_Lenght, ';');
+			if (!Disabled_Warning) std::cout << "视频四路径：" << Quick_Video_Path[3] << endl;
+		}
+		else if (string_Compere(Input, "end"))
+		{
+			break;
+		}
+		else if (string_Compere(Input, "showConsole") || string_Compere(Input, "SC"))
+		{
+			File.getline(Input, sizeof(Input), ';');
+
+			if (atoi(Input) != 0) Show_Console = true; //非零数字改为true，其他数据不更改
+			if (string_Compere(Input, "0")) Show_Console = false; //"0"改为false
+			if (string_Compere(Input, "true")) Show_Console = true;
+			if (string_Compere(Input, "false")) Show_Console = false;
+			if (!Disabled_Warning) std::cout << "显示控制台：" << (Show_Console ? "是" : "否") << endl;
+		}
+		else if (string_Compere(Input, "fontName") || string_Compere(Input, "FN"))
+		{
+			File.getline(Font_Name, Font_Name_Lenght, ';');
 			if (!Disabled_Warning) std::cout << "使用字体：" << Font_Name << endl;
 		}
-		else if (strcmp(Input, "V1D") == 0 || strcmp(Input, "Video_1_Decoder") == 0)
+		else if (string_Compere(Input, "video1Decoder") || string_Compere(Input, "V1D"))
 		{
-			File.getline(Quick_Video_Decoder[0], Video_Decoder_Lenght);
-			if (!Disabled_Warning) std::cout << "视频1使用解码器" << Quick_Video_Decoder[0] << endl;
+			File.getline(Quick_Video_Decoder[0], Video_Decoder_Lenght, ';');
+			if (!Disabled_Warning) std::cout << "视频一使用解码器" << Quick_Video_Decoder[0] << endl;
 		}
-		else if (strcmp(Input, "V2D") == 0 || strcmp(Input, "Video_2_Decoder") == 0)
+		else if (string_Compere(Input, "video2Decoder") || string_Compere(Input, "V2D"))
 		{
-			File.getline(Quick_Video_Decoder[1], Video_Decoder_Lenght);
-			if (!Disabled_Warning) std::cout << "视频2使用解码器" << Quick_Video_Decoder[1] << endl;
+			File.getline(Quick_Video_Decoder[1], Video_Decoder_Lenght, ';');
+			if (!Disabled_Warning) std::cout << "视频二使用解码器" << Quick_Video_Decoder[1] << endl;
 		}
-		else if (strcmp(Input, "V3D") == 0 || strcmp(Input, "Video_3_Decoder") == 0)
+		else if (string_Compere(Input, "video3Decoder") || string_Compere(Input, "V3D"))
 		{
-			File.getline(Quick_Video_Decoder[2], Video_Decoder_Lenght);
-			if (!Disabled_Warning) std::cout << "视频3使用解码器" << Quick_Video_Decoder[2] << endl;
+			File.getline(Quick_Video_Decoder[2], Video_Decoder_Lenght, ';');
+			if (!Disabled_Warning) std::cout << "视频三使用解码器" << Quick_Video_Decoder[2] << endl;
 		}
-		else if (strcmp(Input, "V4D") == 0 || strcmp(Input, "Video_4_Decoder") == 0)
+		else if (string_Compere(Input, "video4Decoder") || string_Compere(Input, "V4D"))
 		{
-			File.getline(Quick_Video_Decoder[3], Video_Decoder_Lenght);
-			if (!Disabled_Warning) std::cout << "视频4使用解码器" << Quick_Video_Decoder[3] << endl;
+			File.getline(Quick_Video_Decoder[3], Video_Decoder_Lenght, ';');
+			if (!Disabled_Warning) std::cout << "视频四使用解码器" << Quick_Video_Decoder[3] << endl;
+		}
+		else
+		{
+			//未知数据
+
+			if (!Disabled_Warning) std::cout << "未知数据：" << Input << endl;
+
+			if (File.eof())
+				break;
+
+			if (!Disabled_Warning) Message(L"存在未知数值，请检查配置文件");
+			File.ignore(0xFFFF, ';');
 		}
 	}
 }

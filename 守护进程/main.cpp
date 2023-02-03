@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "Window_Infomation_Class.h"
 #include "resource.h"
+#include "massage.h"
 //#include <SFML/Graphics.hpp>
 //#include "Operator.h"
 
@@ -12,12 +13,13 @@
 */
 
 /*
-* 0.0.0.1 初号版本 跟随1.0.3.18
-* 0.0.0.2 添加关闭功能 右键功能同左键 中键功能为切换 修改暂停机制，暂停需要超过81%持续5秒，恢复需要2秒 跟随1.0.3.19
+* 0.0.0.1 初号版本
+* 0.0.0.2 添加关闭功能 右键功能同左键 中键功能为切换 修改暂停机制，暂停需要超过81%持续5秒，恢复需要2秒
 * 0.0.0.3 添加白名单和黑名单 （遗忘添加版本号） 2023/1/14
 * 0.0.0.4 修复隐藏控制台后不恢复的bug 2023/1/14
 * 0.0.0.5 修复保存白名单时错误的问题 修复读取错误数值后死循环的bug 2023/2/1
 * 0.0.0.6 更正窗口标题 添加shouconsole参数 字符串匹配将不匹配大小写 2023/2/2
+* 0.0.0.7 修复部分情况下字符串匹配死循环的bug 修复大小写匹配错误的bug 接受部分消息（来自桌面之下的ME_SEARCH） 守护进程匹配更加准确 替换中键为强制暂停 = 2023/2/3
 * 
 * next
 */
@@ -30,7 +32,7 @@ struct Window_And_HWND
 	HWND Window_HWND;
 };
 
-constexpr char Progream_Version[] = "0.0.0.6";
+constexpr char Progream_Version[] = "0.0.0.7";
 constexpr unsigned File_Version = 1;
 constexpr char List_Path[] = ".\\桌面之下\\list.txt";
 constexpr unsigned int update_Time = 1;
@@ -67,6 +69,7 @@ void Enetialize();
 void Save_List(const char Path[]);
 void Load_List(const char Path[]);
 
+void search_All_Window();
 void update_All_Window();
 void pause_All_Window();
 void close_All_Window();
@@ -170,7 +173,7 @@ void Load_List(const char Path[])
 
 	file.getline(buffer, sizeof(buffer), '=');
 
-	if (string_Compere(buffer, "version="))
+	if (string_Compere(buffer, "version"))
 	{
 		file.getline(buffer, ';');
 		if (atoi(buffer) != File_Version)
@@ -284,6 +287,21 @@ void Load_List(const char Path[])
 	return;
 }
 
+
+void search_All_Window()
+{
+	Get_Child_Window(now_Window); //读取全部窗口
+
+	//退回最前
+	while (now_Window->Get_Last_Window_ptr() != nullptr) now_Window = now_Window->Get_Last_Window_ptr();
+	if (now_Window->Get_Window_HWND() == 0 && now_Window->Get_Next_Window_ptr() != nullptr)
+	{
+		//删除0
+		now_Window = now_Window->Get_Next_Window_ptr();
+		delete now_Window->Get_Last_Window_ptr();
+		now_Window->Set_Last_Window_ptr(nullptr);
+	}
+}
 
 void update_All_Window()
 {
@@ -444,6 +462,7 @@ HMENU hMenu = nullptr;
 HINSTANCE hInstance = 0;
 constexpr char no_Window_Text[] = "未找到窗口";
 constexpr char have_Window_Text[] = "已找到窗口";
+
 constexpr unsigned long long ID_AUTO = 40001;
 constexpr unsigned long long ID_HPAUSE = 40002;
 constexpr unsigned long long ID_PAUSED = 40003;
@@ -451,6 +470,7 @@ constexpr unsigned long long ID_SEARCH = 40004;
 constexpr unsigned long long ID_CHANGE = 40005;
 constexpr unsigned long long ID_CLOSE = 40006;
 constexpr unsigned long long ID_EXIT = 40007;
+
 void tray()
 {
 	HWND hwnd;
@@ -460,11 +480,11 @@ void tray()
 	hInstance = GetModuleHandle(NULL);
 	int iCmdShow = SW_SHOW;
 
-	HWND handle = FindWindow(NULL, szWndName);
+	HWND handle = FindWindow(szAppName, szWndName);
 	if (handle != NULL)
 	{
 		//MessageBox(NULL, TEXT("Application is already running"), szAppName, MB_ICONERROR);
-		MessageBox(NULL, TEXT("已有一个守护线程"), szAppName, MB_ICONERROR);
+		MessageBox(NULL, TEXT("已有一个守护进程"), szAppName, MB_ICONERROR);
 		return;
 	}
 
@@ -523,6 +543,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_CREATE:
+	{
 		nid.cbSize = sizeof(nid);
 		nid.hWnd = hwnd;
 		nid.uID = 0;
@@ -544,7 +565,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		Shell_NotifyIcon(NIM_ADD, &nid);
 		break;
+	}
 	case WM_USER:
+	{
 		switch (lParam)
 		{
 		case WM_LBUTTONDOWN:
@@ -581,18 +604,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			case ID_SEARCH:
 			{
-				Get_Child_Window(now_Window); //读取全部窗口
-
-				//退回最前
-				while (now_Window->Get_Last_Window_ptr() != nullptr) now_Window = now_Window->Get_Last_Window_ptr();
-				if (now_Window->Get_Window_HWND() == 0 && now_Window->Get_Next_Window_ptr() != nullptr)
-				{
-					//删除0
-					now_Window = now_Window->Get_Next_Window_ptr();
-					delete now_Window->Get_Last_Window_ptr();
-					now_Window->Set_Last_Window_ptr(nullptr);
-				}
-
+				search_All_Window();
 				break;
 			}
 			case ID_CHANGE:
@@ -616,17 +628,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		case WM_MBUTTONDOWN:
 		{
-			//std::cout << "right pause\n";
+			hPause = !hPause;
 			pause_All_Window();
 			break;
 		}
 		}
 		break;
+	}
 	case WM_DESTROY:
+	{
 		Shell_NotifyIcon(NIM_DELETE, &nid);
 		PostQuitMessage(0);
 		break;
+	}
+	case ME_SEARCH:
+	{
+		search_All_Window();
+		break;
+	}
 	default:
+	{
 		/*
 		 * 防止当Explorer.exe 崩溃以后，程序在系统系统托盘中的图标就消失
 		 *
@@ -637,6 +658,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (message == WM_TASKBARCREATED)
 			SendMessage(hwnd, WM_CREATE, wParam, lParam);
 		break;
+	}
 	}
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
@@ -651,11 +673,29 @@ bool string_Compere(const char STR1[], const char STR2[])
 
 	while (STR1[i] != '\0' && STR2[j] != '\0')
 	{
-		if (STR1[i] != STR2[j] && (STR1[i] - STR2[j] != 32) && (STR2[i] - STR1[j] != 32)) return false; //不相等 且 不是大小写
+		if (STR1[i] != STR2[j] && (STR1[i] - STR2[j] != 32) && (STR2[j] - STR1[i] != 32)) return false; //不相等 且 不是大小写
 		i++;
 		j++;
 		while (STR1[i] == ' ' || STR1[i] == '\n') i++;//排除空格
 		while (STR2[j] == ' ' || STR2[j] == '\n') j++;
+	}
+
+	if (STR1[i] == '\0')
+	{
+		while (STR2[j] != '\0')
+		{
+			if (STR2[j] == ' ' || STR2[j] == '\n') j++;
+			else return false;//后边仍有非空字符
+		}
+	}
+
+	if (STR2[j] == '\0')
+	{
+		while (STR1[i] != '\0')
+		{
+			if (STR1[i] == ' ' || STR1[i] == '\n') i++;
+			else return false;//后边仍有非空字符
+		}
 	}
 
 	return true;

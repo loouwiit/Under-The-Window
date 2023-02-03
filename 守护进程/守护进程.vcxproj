@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="..\桌面之下\Operator.h" />
     <ClInclude Include="..\桌面之下\Window_Infomation_Class.h" />
+    <ClInclude Include="massage.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
