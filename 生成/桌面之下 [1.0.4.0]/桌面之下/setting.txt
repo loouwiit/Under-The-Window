@@ -1,0 +1,10 @@
+version=8;
+ffplayPath=.\ffplay.exe;
+ffmpegPath=.\ffmpeg.exe;
+keepPath=.\守护进程.exe;
+video1Path=.\1.mp4;
+video2Path=.\2.mp4;
+video3Path=.\3.mp4;
+video4Path=.\4.mp4;
+window=0000000000000000 0000000000000000 0 0 0 0;
+end

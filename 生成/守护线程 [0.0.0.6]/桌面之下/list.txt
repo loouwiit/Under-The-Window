@@ -1,5 +1,0 @@
-version=1;
-whitekList=启动;
-whitekList=任务视图;
-blackList=游戏窗口名;
-end
