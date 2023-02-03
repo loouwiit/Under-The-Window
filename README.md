@@ -19,7 +19,6 @@ setting.txt:<br/>
  |　version=文件版本; <br/>
  |　blackList=黑名单窗口标题; <br/>
  |　whiteList=白名单窗口标题; <br/>
- |　[ showConsole=true; ]<br/>
  |　…… <br/>
  | end <br/>
  <br/>
