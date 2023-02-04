@@ -55,14 +55,15 @@
 * 1.0.3.19 修改Pause为SandMessage 当窗口是ffplay时替换恢复窗口为关闭窗口 修改窗口时不再强制恢复桌面之上了 修复最后一项搜索PM子窗口的时候不更新的bug 修复搜索PM子窗口在0后新建的bug 2023/1/13
 * 1.0.4.0(1.0.3.20) 使用键值对的方式存储数据 修改文件版本号为8 发现关闭窗口后不更新的bug 当窗口是ffplay时替换置顶窗口为启动守护进程 播放视频后若存在守护进程则发送消息（ME_SEARCH）给守护进程 2023/2/3
 * 1.0.4.1 修复启动桌面之下时不会更新窗口信息的bug（Get_Form_Char将调用Update_Infomation函数） 2023/2/4
+* 1.0.4.2 当守护进程存在时移交暂停壁纸给守护进程 添加ME_CHANGE消息给守护进程 修复启动守护进程后不自动更新的bug 精简发送消息的代码 自动适配msyh.ttf 2023/2/4
 * 
-* Next 更改窗口名称 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 任务栏显示ffplay的bug 关闭窗口后不更新的bug dll拆分 守护进程暂停联合 自动适配msyh.ttf
+* Next 更改窗口名称 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 任务栏显示ffplay的bug 关闭窗口后不更新的bug dll拆分
 */
 
 #define	Message(STRING) MessageBox(NULL, STRING, L"桌面之下", MB_YESNO)
 
 constexpr unsigned File_Version = 8;
-constexpr char Progream_Version[] = "1.0.4.1";
+constexpr char Progream_Version[] = "1.0.4.2";
 //constexpr unsigned Progream_Version = 2;
 constexpr char endl = '\n';
 

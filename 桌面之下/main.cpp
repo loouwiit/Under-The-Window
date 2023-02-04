@@ -120,7 +120,7 @@ void Set_File_Setting(const char Setting_File_Path[])
 	}
 
 	if (Show_Console) File << "showConsole=true;" << endl;//显示控制台
-	if (strcmp(Font_Name, "msyh.ttc") != 0) File << "fontName=" << Font_Name << ';' << endl;//写入字体名称
+	if (strcmp(Font_Name, "msyh.ttc") != 0 && strcmp(Font_Name, "msyh.ttf") != 0) File << "fontName=" << Font_Name << ';' << endl;//写入字体名称
 	for (int Number = 0; Number < 4; Number++)
 		if (Quick_Video_Decoder[Number][0] != '\0') File << "video" << Number + 1 << "Decoder=" << Quick_Video_Decoder[Number] << ';' << endl;//写入解码器
 	File << "end" << endl;
@@ -596,35 +596,43 @@ void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[])
 void Keep_Massage(Message_t ID)
 {
 	if (!IsWindow(Keep_HWND)) Keep_HWND = FindWindow(L"守护进程", L"守护进程");
-	switch (ID)
-	{
-	case 0:
-	{
-		if (Keep_HWND == 0)
-		{
-			//启动守护进程
-			constexpr int Param_Lengh = 1;
-			char Param[Param_Lengh] = "";
-			STARTUPINFOA si{ 0 };
-			PROCESS_INFORMATION pi{ 0 };
-			if (CreateProcessA(Keep_Path, Param, 0, 0, 0, CREATE_NEW_CONSOLE | IDLE_PRIORITY_CLASS, 0, 0, &si, &pi))//新控制台，低优先级
-			{
-				CloseHandle(pi.hProcess);//关闭句柄 https://learn.microsoft.com/zh-cn/cpp/code-quality/c6335?view=msvc-170
-				CloseHandle(pi.hThread);
-			}
-			else Message(L"启动失败");
-		}
-		break;
-	}
-	case ME_SEARCH:
-	{
-		if (Keep_HWND == NULL) break;
 
-		PostMessageA(Keep_HWND, ME_SEARCH, NULL, NULL);
+	if (ID == 0 && Keep_HWND == NULL)
+	{
+		//启动守护进程
+		constexpr int Param_Lengh = 1;
+		char Param[Param_Lengh] = "";
+		STARTUPINFOA si{ 0 };
+		PROCESS_INFORMATION pi{ 0 };
+		if (CreateProcessA(Keep_Path, Param, 0, 0, 0, CREATE_NEW_CONSOLE | IDLE_PRIORITY_CLASS, 0, 0, &si, &pi))//新控制台，低优先级
+		{
+			CloseHandle(pi.hProcess);//关闭句柄 https://learn.microsoft.com/zh-cn/cpp/code-quality/c6335?view=msvc-170
+			CloseHandle(pi.hThread);
+			Keep_HWND = FindWindow(L"守护进程", L"守护进程");
+		}
+		else Message(L"启动失败");
+		return;
 	}
-	default:
-		break;
-	}
+
+	if (Keep_HWND == NULL) return;
+
+	PostMessageA(Keep_HWND, ID, NULL, NULL);
+
+	//switch (ID)
+	//{
+	//case ME_SEARCH:
+	//{
+	//	PostMessageA(Keep_HWND, ME_SEARCH, NULL, NULL);
+	//	break;
+	//}
+	//case ME_CHANGED:
+	//{
+	//	PostMessageA(Keep_HWND, ME_CHANGED, NULL, NULL);
+	//	break;
+	//}
+	//default:
+	//	break;
+	//}
 }
 
 void Move_Window(Window_Infomation* Node, ENUM::Move_Type Flag)

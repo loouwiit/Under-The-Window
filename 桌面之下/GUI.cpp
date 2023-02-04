@@ -103,7 +103,15 @@ void Initialize()
 	GetSystemDirectory(System_Floor,50);//C:\windows\system32
 	System_Floor[1] = L'\0';//截止C
 	sprintf_s(Fonts_Path, "%ws:/Windows/Fonts/%s", System_Floor, Font_Name);//设置路径
-	Text_Fort.loadFromFile(Fonts_Path);//设置字体——微软雅黑
+	if (!Text_Fort.loadFromFile(Fonts_Path))
+	{
+		//失败后自动加载msyh.ttf;
+		if (strcmp(Fonts_Path, "msth.ttc"))
+		{
+			Fonts_Path[7] = 'f';//ttc->ttf
+			Text_Fort.loadFromFile(Fonts_Path);
+		}
+	}
 
 	//Self_HWND = FindWindow(L"SFML_Window", L"桌面之下");//获取自己的句柄 1.0.2.5交给对象实现
 
@@ -770,8 +778,13 @@ void Event(bool Flag)
 					{
 						//Keep_Under();//保持之下 1.0.2.5删除
 						//Record();//1.0.3.14试图添加
-						if (Now_Window->Is_ffplay_Window())//1.0.3.16加入
-							Now_Window->Send_Message(VK_SPACE,0x00390001);
+						if (Now_Window->Is_ffplay_Window())
+						{
+							if (IsWindow(Keep_HWND))
+								Keep_Massage(ME_CHANGE); //1.0.4.1转移给守护进程处理
+							else
+								Now_Window->Send_Message(VK_SPACE, 0x00390001); //1.0.3.16加入
+						}
 						else
 							Now_Window->Update_Is_ffplay_Window();
 					}
