@@ -94,6 +94,7 @@ void Initialize()
 	if (Console_HWND != NULL && !Show_Console) ShowWindow(Console_HWND, SW_HIDE);//隐藏窗口
 	Window_Infomation::Set_Self_Window_Exist(true);
 	Window_Infomation::Find_Self_Window_HWND();
+	Keep_HWND = FindWindow(L"守护进程", L"守护进程");//1.0.4.1
 
 	SPF = 33;//设置帧率
 

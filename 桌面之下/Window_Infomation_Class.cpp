@@ -33,7 +33,7 @@ Window_Infomation::Window_Infomation()
 	Window_Infomation::All_Window_Number++;
 
 	//this->Window_Is_Pause = false;
-	Update_Is_ffplay_Window();
+	//Update_Is_ffplay_Window(); //this->Window_HWND == NULL,Ò»¶¨Îªfalse; 1.0.4.1
 }
 
 /// <summary>
@@ -535,9 +535,11 @@ void Window_Infomation::Set_From_Char(const char* string)
 	this->Window_Oreginal_RECT.right = strtoul(out_String[4], nullptr, 16);
 	this->Window_Oreginal_RECT.bottom = strtoul(out_String[5], nullptr, 16);
 
-	delete[] char_String;
 	for (unsigned i = 0; i < 6; i++)
 		out_String[i] = nullptr;
+	delete[] char_String;
+
+	this->Update_Window_HWND(); //1.0.4.1
 }
 
 /// <summary>
