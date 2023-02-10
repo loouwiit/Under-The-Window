@@ -9,6 +9,7 @@ void CMD_Get(const char Setting_Path[], const char Param_Name[]);
 void CMD_Set(const char Setting_Path[], const char Param_Name[], const char Param_Value[]);
 void CMD_Under(const char Window_HWND_Char[], const char Setting_Path[]);
 void CMD_Up(const char Window_HWND_Char[], const char Setting_Path[]);
+void CMD_Pause(const char Setting_Path[]);
 
 bool CMD_Call(const int argc, const char* argv[])
 {
@@ -161,6 +162,24 @@ bool CMD_Call(const int argc, const char* argv[])
 			break;
 		}
 	}
+	else if (strcmp(argv[1], "-pause") == 0)
+	{
+		//self -pause setting_path
+		switch (argc)
+		{
+		case 2:
+		{
+			char Setting_File_Path[Setting_File_Lenght] = "";
+			sprintf_s(Setting_File_Path, Setting_File_Lenght, "%s%s", Setting_Floor_Path, Setting_File_Name);
+			CMD_Pause(Setting_File_Path);
+			break;
+		}
+		case 3:
+		{
+			CMD_Pause(argv[2]);
+		}
+		}
+	}
 	else
 	{
 		std::cout << "未知指令，输入-help获取帮助" << endl;
@@ -183,7 +202,8 @@ void CMD_Help(const char Command[])
 			<< "-set" << TAB << "设置参数" << endl
 			<< "-get" << TAB << "获取参数" << endl
 			<< "-under" << TAB << "将窗口移到桌面之下" << endl
-			<< "-up" << TAB << "将窗口恢复" << endl;
+			<< "-up" << TAB << "将窗口恢复" << endl
+			<< "-pause" << TAB << "将壁纸暂停" << endl;
 	}
 	else
 	{
@@ -209,6 +229,7 @@ void CMD_Help(const char Command[])
 			<< "可用参数:" << endl
 			<< "ffplay_path" << TAB << "获取ffplay的路径" << endl
 			<< "ffmpeg_path" << TAB << "获取ffmpeg的路径" << endl
+			<< "keep_path" << TAB << "获取守护进程的路径" << endl
 			<< "show_console" << TAB << "获取是否显示控制台" << endl
 			<< "font" << TAB << "获取字体名称" << endl
 			<< "Nvideo_path" << TAB << "获取视频N的路径" << endl
@@ -218,6 +239,7 @@ void CMD_Help(const char Command[])
 			<< "可用参数:" << endl
 			<< "ffplay_path" << TAB << "设置ffplay的路径" << endl
 			<< "ffmpeg_path" << TAB << "设置ffmpeg的路径" << endl
+			<< "keep_path" << TAB << "设置守护进程的路径" << endl
 			<< "show_console" << TAB << "设置是否显示控制台" << endl
 			<< "font" << TAB << "设置字体名称" << endl
 			<< "Nvideo_path" << TAB << "设置视频N的路径" << endl
@@ -228,6 +250,8 @@ void CMD_Help(const char Command[])
 		else if (strcmp(Command, "-up") == 0) std::cout << "-up:将窗口恢复" << endl
 			<< "语法:-up 窗口句柄 [设置文件路径]" << endl
 			<< "语法:-up all [设置文件路径]" << endl;
+		else if (strcmp(Command, "-pause") == 0)std::cout << "-pause:将壁纸暂停" << endl
+			<< "语法:-pause [设置文件路径]" << endl;
 	}
 }
 
@@ -235,6 +259,8 @@ void CMD_Play(const char Video_Path[], const char Setting_Path[])
 {
 	Reset_Setting();
 	Get_File_Setting(Setting_Path, true);//读取设置
+
+	if (!IsWindow(Keep_HWND)) Keep_HWND = FindWindow(L"守护进程", L"守护进程"); //获取守护进程句柄
 
 	int Quick_Video_Number = -1;
 	if (Video_Path[1] == '\0')
@@ -272,6 +298,7 @@ void CMD_Get(const char Setting_Path[], const char Param_Name[])
 
 	if (strcmp(Param_Name, "ffplay_path") == 0 || strcmp(Param_Name, "FPP") == 0) std::cout << "ffplay路径:" << FFplay_Path << endl;
 	else if (strcmp(Param_Name, "ffmpeg_path") == 0 || strcmp(Param_Name, "FMP") == 0) std::cout << "ffmpeg路径:" << FFmpeg_Path << endl;
+	else if (strcmp(Param_Name, "keep_path") == 0||strcmp(Param_Name, "KP") == 0) std::cout << "守护进程路径:" << Keep_Path << endl;
 	else if (strcmp(Param_Name, "show_console") == 0 || strcmp(Param_Name, "SC") == 0) std::cout << "显示控制台:" << (Show_Console ? "true" : "false") << endl;
 	else if (strcmp(Param_Name, "font") == 0 || strcmp(Param_Name, "FN") == 0) std::cout << "字体名称:" << Font_Name << endl;
 	else if (strcmp(Param_Name, "0video_path") == 0 || strcmp(Param_Name, "V0P") == 0) std::cout << "全部视频的路径:" << endl << Quick_Video_Path[0] << endl << Quick_Video_Path[1] << endl << Quick_Video_Path[2] << endl << Quick_Video_Path[3] << endl;
@@ -294,6 +321,7 @@ void CMD_Set(const char Setting_Path[], const char Param_Name[], const char Para
 
 	if (strcmp(Param_Name, "ffplay_path") == 0 || strcmp(Param_Name, "FPP") == 0) strcpy_s(FFplay_Path, FFplay_Path_Lenght, Param_Value);
 	else if (strcmp(Param_Name, "ffmpeg_path") == 0 || strcmp(Param_Name, "FMP") == 0) strcpy_s(FFmpeg_Path, FFplay_Path_Lenght, Param_Value);
+	else if (strcmp(Param_Name, "keep_path") == 0 || strcmp(Param_Name, "KP") == 0) strcpy_s(Keep_Path, Keep_Path_Lenght, Param_Value);
 	else if (strcmp(Param_Name, "show_console") == 0 || strcmp(Param_Name, "SC") == 0) Show_Console = Param_Value[0] == 'T' || Param_Value[0] == 't' || atoi(Param_Value) != 0;
 	else if (strcmp(Param_Name, "font") == 0 || strcmp(Param_Name, "FN") == 0) strcpy_s(Font_Name, Font_Name_Lenght, Param_Value);
 	else if (strcmp(Param_Name, "1video_path") == 0 || strcmp(Param_Name, "V1P") == 0) strcpy_s(Quick_Video_Path[0], Video_Path_Lenght, Param_Value);
@@ -421,4 +449,29 @@ void CMD_Up(const char Window_HWND_Char[], const char Setting_Path[])
 
 	if (File_Exist) Set_File_Setting(Setting_Path);
 	else std::cout << "不存在设置文件，此操作未保存" << endl;
+}
+
+void CMD_Pause(const char Setting_Path[])
+{
+	Reset_Setting();
+	Get_File_Setting(Setting_Path, true);
+	Get_Child_Window(Now_Window);//所有窗口一定存在于链表之中，1.0.3.5后的PM枚举
+
+	if (!IsWindow(Keep_HWND)) Keep_HWND = FindWindow(L"守护进程", L"守护进程");
+	if (Keep_HWND == NULL)
+	{
+		//自己处理
+		while (Now_Window->Get_Last_Window_ptr() != nullptr)
+			Now_Window = Now_Window->Get_Last_Window_ptr();
+
+		while (Now_Window != nullptr)
+		{
+			if (Now_Window->Is_ffplay_Window()) Now_Window->Send_Message(VK_SPACE, 0x00390001);
+			Now_Window = Now_Window->Get_Next_Window_ptr();
+		}
+	}
+	else
+	{
+		Keep_Massage(ME_CHANGE);
+	}
 }

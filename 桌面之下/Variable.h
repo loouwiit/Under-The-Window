@@ -56,6 +56,7 @@
 * 1.0.4.0(1.0.3.20) 使用键值对的方式存储数据 修改文件版本号为8 发现关闭窗口后不更新的bug 当窗口是ffplay时替换置顶窗口为启动守护进程 播放视频后若存在守护进程则发送消息（ME_SEARCH）给守护进程 2023/2/3
 * 1.0.4.1 修复启动桌面之下时不会更新窗口信息的bug（Get_Form_Char将调用Update_Infomation函数） 2023/2/4
 * 1.0.4.2 当守护进程存在时移交暂停壁纸给守护进程 添加ME_CHANGE消息给守护进程 修复启动守护进程后不自动更新的bug 精简发送消息的代码 自动适配msyh.ttf 2023/2/4
+* 1.0.4.3 规范Sand_Message传入0的行为 -get与-set添加keep_path选项，添加-pause命令 命令行调用播放时也会寻找守护进程了 2023/2/10
 * 
 * Next 更改窗口名称 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 任务栏显示ffplay的bug 关闭窗口后不更新的bug dll拆分
 */
@@ -63,7 +64,7 @@
 #define	Message(STRING) MessageBox(NULL, STRING, L"桌面之下", MB_YESNO)
 
 constexpr unsigned File_Version = 8;
-constexpr char Progream_Version[] = "1.0.4.2";
+constexpr char Progream_Version[] = "1.0.4.3";
 //constexpr unsigned Progream_Version = 2;
 constexpr char endl = '\n';
 
@@ -156,7 +157,7 @@ void Repair_W1_W2_Error(Window_Infomation* Window_Infomation_ptr = nullptr);//�
 void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[]);//播放视频
 void Creat_Vidoe_Texture(int Number);//创建图片
 //void Get_PM_Window_HWND(HWND& Return);//获取PM窗口句柄
-void Keep_Massage(Message_t ID);//发送消息给守护进程
+void Keep_Massage(Message_t ID, const bool Disabled_Warning = false);//发送消息给守护进程
 
 void Move_Window(Window_Infomation* Node, ENUM::Move_Type Flag);//移动窗口
 

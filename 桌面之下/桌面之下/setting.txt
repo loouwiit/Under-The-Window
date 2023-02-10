@@ -7,6 +7,6 @@ video2Path=D:\File\特殊\动态壁纸\video\15.mp4;
 video3Path=D:\File\特殊\动态壁纸\video\17.mp4;
 video4Path=D:\File\特殊\动态壁纸\video\18.mp4;
 window=0000000000261230 0000000000000000 0 0 0 0;
-window=0000000000261230 0000000000000000 0 0 0 0;
+window=0000000000050B8A 0000000000000000 0 0 780 438;
 showConsole=true;
 end

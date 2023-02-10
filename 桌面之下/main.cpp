@@ -593,25 +593,29 @@ void Play_Video(const char Video_Path_Param[], const char Video_Decoder_Param[])
 	}
 }
 
-void Keep_Massage(Message_t ID)
+void Keep_Massage(Message_t ID, const bool Disabled_Warning)
 {
 	if (!IsWindow(Keep_HWND)) Keep_HWND = FindWindow(L"守护进程", L"守护进程");
 
-	if (ID == 0 && Keep_HWND == NULL)
+	if (ID == 0)
 	{
-		//启动守护进程
-		constexpr int Param_Lengh = 1;
-		char Param[Param_Lengh] = "";
-		STARTUPINFOA si{ 0 };
-		PROCESS_INFORMATION pi{ 0 };
-		if (CreateProcessA(Keep_Path, Param, 0, 0, 0, CREATE_NEW_CONSOLE | IDLE_PRIORITY_CLASS, 0, 0, &si, &pi))//新控制台，低优先级
+		if (Keep_HWND == NULL)
 		{
-			CloseHandle(pi.hProcess);//关闭句柄 https://learn.microsoft.com/zh-cn/cpp/code-quality/c6335?view=msvc-170
-			CloseHandle(pi.hThread);
-			Keep_HWND = FindWindow(L"守护进程", L"守护进程");
+			//启动守护进程
+			constexpr int Param_Lengh = 1;
+			char Param[Param_Lengh] = "";
+			STARTUPINFOA si{ 0 };
+			PROCESS_INFORMATION pi{ 0 };
+			if (CreateProcessA(Keep_Path, Param, 0, 0, 0, CREATE_NEW_CONSOLE | IDLE_PRIORITY_CLASS, 0, 0, &si, &pi))//新控制台，低优先级
+			{
+				CloseHandle(pi.hProcess);//关闭句柄 https://learn.microsoft.com/zh-cn/cpp/code-quality/c6335?view=msvc-170
+				CloseHandle(pi.hThread);
+				Keep_HWND = FindWindow(L"守护进程", L"守护进程");
+			}
+			else if (!Disabled_Warning) Message(L"启动失败");
+			return;
 		}
-		else Message(L"启动失败");
-		return;
+		else return;
 	}
 
 	if (Keep_HWND == NULL) return;
