@@ -57,14 +57,15 @@
 * 1.0.4.1 修复启动桌面之下时不会更新窗口信息的bug（Get_Form_Char将调用Update_Infomation函数） 2023/2/4
 * 1.0.4.2 当守护进程存在时移交暂停壁纸给守护进程 添加ME_CHANGE消息给守护进程 修复启动守护进程后不自动更新的bug 精简发送消息的代码 自动适配msyh.ttf 2023/2/4
 * 1.0.4.3 规范Sand_Message传入0的行为 -get与-set添加keep_path选项，添加-pause命令 命令行调用播放时也会寻找守护进程了 2023/2/10
+* 1.0.4.4 默认ffplay、ffmpeg路径为.\ffplay.exe和.\ffmpeg.exe，默认守护进程路径改为.\守护进程.exe 若读取设置文件失败将会尝试读取转移文件，更改设置路径。但File_Exits仍为False
 * 
-* Next 更改窗口名称 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 任务栏显示ffplay的bug 关闭窗口后不更新的bug dll拆分
+* Next 更改窗口名称 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 任务栏显示ffplay的bug 关闭窗口后不更新的bug dll拆分 规范Reload_File与Get_File_Setting、形参Setting_File_Path与全局变量Setting_Floor_Path的关系
 */
 
 #define	Message(STRING) MessageBox(NULL, STRING, L"桌面之下", MB_YESNO)
 
 constexpr unsigned File_Version = 8;
-constexpr char Progream_Version[] = "1.0.4.3";
+constexpr char Progream_Version[] = "1.0.4.4";
 //constexpr unsigned Progream_Version = 2;
 constexpr char endl = '\n';
 
@@ -126,7 +127,7 @@ extern char Font_Name[Font_Name_Lenght];//字体名称
 extern char FFplay_Path[FFplay_Path_Lenght];//ffplay路径
 extern char FFmpeg_Path[FFplay_Path_Lenght];//ffmpeg路径
 //extern char Video_Recorder[Recorder_Lenght];//视频录制来源
-extern char Audio_Recorder[Recorder_Lenght];//音频录制来源
+//extern char Audio_Recorder[Recorder_Lenght];//音频录制来源
 extern char Quick_Video_Path[4][Video_Path_Lenght];//快速播放路径
 extern char Quick_Video_Name[4][20];//快速播放图片名称
 extern char Quick_Video_Decoder[4][Video_Decoder_Lenght];//快速播放解码器
@@ -144,6 +145,8 @@ void Sleep();//休息
 void Event(bool Flag = true);//事件 GUI
 
 void Reset_Setting();//重置设置
+bool Change_File_Path(const char Change_Path[]);//转移目录
+void Reload_File(bool Disabled_Warning);//重新加载设置
 void Get_File_Setting(const char Setting_File_Path[], const bool Disabled_Warning = false);//获取设置
 void Set_File_Setting(const char Setting_File_Path[]);//保存设置
 void Get_Child_Window(Window_Infomation* Window_Infomation_ptr, HWND Parent_Window_WHND = Window_Infomation::Get_PM_Window_HWND());//枚举并连接PM的子窗口

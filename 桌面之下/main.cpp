@@ -31,12 +31,34 @@ void Reset_Setting()
 {
 	File_Exist = false;
 //	Undered = false; 1.0.2.5后交给对象处理
-//	strcpy_s(FFplay_Path , "");
+	strcpy_s(FFplay_Path , ".\\ffplay.exe");
+	strcpy_s(FFmpeg_Path , ".\\ffmpeg.exe");
+	strcpy_s(Keep_Path , ".\\守护进程.exe");
 	strcpy_s(Font_Name, Font_Name_Lenght, "msyh.ttc");
 	for (int i = 0; i < 4; i++)
 		strcpy_s(Quick_Video_Path[i], (size_t)Video_Path_Lenght, "");
 
 //	Get_PM_Window_HWND(PM_Window_HWND); 1.0.2.5后交给对象自动处理
+}
+
+bool Change_File_Path(const char Change_Path[])
+{
+	char Path[Setting_File_Lenght] = "";
+	Spict_Path(Change_Path, Path, Setting_File_Lenght);
+
+	if (strcmp(Path, Setting_Floor_Path) == 0) return false;
+
+	strcpy_s(Setting_Floor_Path, Setting_File_Lenght, Path);
+	return true;
+
+	//return SetCurrentDirectoryA(Path) != 0;
+}
+
+void Reload_File(bool Disabled_Warning)
+{
+	char Buffer[Setting_File_Lenght] = "";
+	sprintf_s(Buffer, Setting_File_Lenght, "%s%s", Setting_Floor_Path, Setting_File_Name);
+	Get_File_Setting(Buffer, Disabled_Warning);
 }
 
 void Set_File_Setting(const char Setting_File_Path[])
@@ -136,7 +158,19 @@ void Get_File_Setting(const char Setting_File_Path[], const bool Disabled_Warnin
 	if (!File.is_open())
 	{
 		//失败
-		File_Exist = false;
+		File.open(".\\桌面之下\\settingPath.txt");
+		if (File.is_open())
+		{
+			//转换位置 1.0.4.4
+			char Buffer[Setting_File_Lenght] = "";
+			File.getline(Buffer, Setting_File_Lenght);
+			File.close();
+
+			if (!Disabled_Warning) std::cout << "存在转移文件:" << Buffer << endl;
+			if (Change_File_Path(Buffer)) Reload_File(Disabled_Warning); //改变成功
+		}
+
+		File_Exist = false;//对于传入的Setting_File_Path来说false
 		return;
 	}
 

@@ -1,6 +1,6 @@
 version=8;
-ffplayPath=D:\File\Program\ffmpeg\ffplay.exe;
-ffmpegPath=D:\File\Program\ffmpeg\ffmpeg.exe;
+ffplayPath=ffplay.exe;
+ffmpegPath=ffmpeg.exe;
 keepPath=..\守护进程\守护进程.exe;
 video1Path=D:\File\特殊\动态壁纸\video\1.mp4;
 video2Path=D:\File\特殊\动态壁纸\video\15.mp4;

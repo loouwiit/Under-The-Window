@@ -13,9 +13,9 @@ sf::Image Progream_Icon;//图标
 //HWND Self_HWND;//自己的句柄
 HWND Console_HWND;//控制台的句柄
 HWND Keep_HWND;//守护进程的句柄 1.0.4.0
-char FFplay_Path[FFplay_Path_Lenght] = "";//ffplay路径
-char FFmpeg_Path[FFplay_Path_Lenght] = "";//ffmpeg路径
-char Keep_Path[Keep_Path_Lenght] = "";//守护进程路径
+char FFplay_Path[FFplay_Path_Lenght] = ".\\ffplay.exe";//ffplay路径
+char FFmpeg_Path[FFplay_Path_Lenght] = ".\\ffmpeg.exe";//ffmpeg路径
+char Keep_Path[Keep_Path_Lenght] = ".\\守护进程.exe";//守护进程路径
 char Setting_Floor_Path[Setting_File_Lenght] = ".\\桌面之下\\";//设置文件夹的路径
 char Setting_File_Name[Setting_File_Lenght] = "setting.txt";//设置文件的名称
 
