@@ -106,9 +106,9 @@ void Initialize()
 	if (!Text_Fort.loadFromFile(Fonts_Path))
 	{
 		//失败后自动加载msyh.ttf;
-		if (strcmp(Fonts_Path, "msth.ttc"))
+		if (strcmp(Font_Name, "msyh.ttc") == 0)
 		{
-			Fonts_Path[7] = 'f';//ttc->ttf
+			Fonts_Path[24] = 'f';//ttc->ttf
 			Text_Fort.loadFromFile(Fonts_Path);
 		}
 	}
