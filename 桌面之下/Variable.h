@@ -59,6 +59,7 @@
 * 1.0.4.3 规范Sand_Message传入0的行为 -get与-set添加keep_path选项，添加-pause命令 命令行调用播放时也会寻找守护进程了 2023/2/10
 * 1.0.4.4 默认ffplay、ffmpeg路径为.\ffplay.exe和.\ffmpeg.exe，默认守护进程路径改为.\守护进程.exe 若读取设置文件失败将会尝试读取转移文件，更改设置路径。但File_Exits仍为False
 * 1.0.4.5 修复加载字体失败后自动加载错误的bug
+* 1.0.4.6 添加-close参数关闭壁纸 修改-up参数对壁纸的行为为关闭 2023/6/17
 * 
 * Next 更改窗口名称 指定视频分辨率(-x -y) -repair 加入录制屏幕功能(ffmpeg) 任务栏显示ffplay的bug 关闭窗口后不更新的bug dll拆分 规范Reload_File与Get_File_Setting、形参Setting_File_Path与全局变量Setting_Floor_Path的关系
 */
@@ -66,7 +67,7 @@
 #define	Message(STRING) MessageBox(NULL, STRING, L"桌面之下", MB_YESNO)
 
 constexpr unsigned File_Version = 8;
-constexpr char Progream_Version[] = "1.0.4.5";
+constexpr char Progream_Version[] = "1.0.4.6";
 //constexpr unsigned Progream_Version = 2;
 constexpr char endl = '\n';
 

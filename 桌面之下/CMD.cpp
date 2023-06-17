@@ -10,6 +10,7 @@ void CMD_Set(const char Setting_Path[], const char Param_Name[], const char Para
 void CMD_Under(const char Window_HWND_Char[], const char Setting_Path[]);
 void CMD_Up(const char Window_HWND_Char[], const char Setting_Path[]);
 void CMD_Pause(const char Setting_Path[]);
+void CMD_Close(const char Setting_Path[]);
 
 bool CMD_Call(const int argc, const char* argv[])
 {
@@ -180,6 +181,24 @@ bool CMD_Call(const int argc, const char* argv[])
 		}
 		}
 	}
+	else if (strcmp(argv[1], "-close") == 0)
+	{
+		//self -close setting_path
+		switch (argc)
+		{
+		case 2:
+		{
+			char Setting_File_Path[Setting_File_Lenght] = "";
+			sprintf_s(Setting_File_Path, Setting_File_Lenght, "%s%s", Setting_Floor_Path, Setting_File_Name);
+			CMD_Close(Setting_File_Path);
+			break;
+		}
+		case 3:
+		{
+			CMD_Close(argv[2]);
+		}
+		}
+	}
 	else
 	{
 		std::cout << "未知指令，输入-help获取帮助" << endl;
@@ -203,7 +222,8 @@ void CMD_Help(const char Command[])
 			<< "-get" << TAB << "获取参数" << endl
 			<< "-under" << TAB << "将窗口移到桌面之下" << endl
 			<< "-up" << TAB << "将窗口恢复" << endl
-			<< "-pause" << TAB << "将壁纸暂停" << endl;
+			<< "-pause" << TAB << "将壁纸暂停" << endl
+			<< "-close" << TAB << "将壁纸关闭" << endl;
 	}
 	else
 	{
@@ -252,6 +272,8 @@ void CMD_Help(const char Command[])
 			<< "语法:-up all [设置文件路径]" << endl;
 		else if (strcmp(Command, "-pause") == 0)std::cout << "-pause:将壁纸暂停" << endl
 			<< "语法:-pause [设置文件路径]" << endl;
+		else if (strcmp(Command, "-close") == 0)std::cout << "-close:将壁纸关闭" << endl
+			<< "语法:-close [设置文件路径]" << endl;
 	}
 }
 
@@ -403,8 +425,9 @@ void CMD_Up(const char Window_HWND_Char[], const char Setting_Path[])
 		{
 			if (Now_Window->Is_Undered() == true)
 			{
-				//如果在桌面之下就移动
-				Now_Window->Set_Window_Up();
+				//如果在桌面之下就关闭或恢复
+				if (Now_Window->Is_ffplay_Window()) Now_Window->Send_Message(VK_ESCAPE, 0x00010001);
+				else Now_Window->Set_Window_Up();
 			}
 
 			Now_Window = Now_Window->Get_Next_Window_ptr();
@@ -473,5 +496,31 @@ void CMD_Pause(const char Setting_Path[])
 	else
 	{
 		Keep_Massage(ME_CHANGE);
+	}
+}
+
+//1.0.4.6
+void CMD_Close(const char Setting_Path[])
+{
+	Reset_Setting();
+	Get_File_Setting(Setting_Path, true);
+	Get_Child_Window(Now_Window);//所有窗口一定存在于链表之中，1.0.3.5后的PM枚举
+
+	if (!IsWindow(Keep_HWND)) Keep_HWND = FindWindow(L"守护进程", L"守护进程");
+	if (Keep_HWND == NULL)
+	{
+		//自己处理
+		while (Now_Window->Get_Last_Window_ptr() != nullptr)
+			Now_Window = Now_Window->Get_Last_Window_ptr();
+
+		while (Now_Window != nullptr)
+		{
+			if (Now_Window->Is_ffplay_Window()) Now_Window->Send_Message(VK_ESCAPE, 0x00010001);
+			Now_Window = Now_Window->Get_Next_Window_ptr();
+		}
+	}
+	else
+	{
+		Keep_Massage(ME_CLOSE);
 	}
 }

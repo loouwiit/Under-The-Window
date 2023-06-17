@@ -22,6 +22,7 @@
 * 0.0.0.7 修复部分情况下字符串匹配死循环的bug 修复大小写匹配错误的bug 接受部分消息（来自桌面之下的ME_SEARCH） 守护进程匹配更加准确 替换中键为强制暂停 2023/2/3
 * 0.0.0.8 接受ME_CHANGED消息，调用强制暂停 2023/2/4
 * 0.0.0.9 把W1、W2窗口设定为白名单，不会错误识别桌面为大窗口 修复显示窗口模式下直接退出的bug 2023/2/4
+* 1.0.0.0 添加ME_CLOSE与桌面之下交流关闭全部 2023/6/17
 * 
 * next
 */
@@ -34,7 +35,7 @@ struct Window_And_HWND
 	HWND Window_HWND;
 };
 
-constexpr char Progream_Version[] = "0.0.0.9";
+constexpr char Progream_Version[] = "1.0.0.0";
 constexpr unsigned File_Version = 1;
 constexpr char List_Path[] = ".\\桌面之下\\list.txt";
 constexpr unsigned int update_Time = 1;
@@ -651,6 +652,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//1.0.4.1
 		hPause = !hPause;
 		pause_All_Window();
+		break;
+	}
+	case ME_CLOSE:
+	{
+		//1.0.4.6 & 1.0.0.0
+		close_All_Window();
 		break;
 	}
 	default:
